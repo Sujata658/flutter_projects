@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "171580447908",
+    "project_id": "instagramclone-dcadb",
+    "storage_bucket": "instagramclone-dcadb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171580447908:android:a8093c10e3f837fcc89a31",
+        "android_client_info": {
+          "package_name": "com.funky.insta_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171580447908-mff13j5hr78j0gg3o0s168o6j4odrhkn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCECaPC9kYeH1-7K5G7M1AbFwHYF-4s4_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171580447908-mff13j5hr78j0gg3o0s168o6j4odrhkn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
