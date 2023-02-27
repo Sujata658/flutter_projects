@@ -1,4 +1,5 @@
 import 'package:bubbletrouble/button.dart';
+import 'package:bubbletrouble/player.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,38 +10,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+      double playerX = 0;
+  void moveRight() {
+    setState(() {
+      playerX += 0.1;
+    });
+  }
+
+  void moveUp() {}
+  void moveLeft() {
+    setState(() {
+      playerX -= 0.1;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-            flex: 3,
-            child: Container(
-              color: Color.fromARGB(190, 134, 255, 229),
-              child: Container(child: Stack(
+          flex: 3,
+          child: Container(
+            color: Color.fromARGB(190, 134, 255, 229),
+            child: Center(
+              child: Stack(
                 children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.yellow,
-                  )
+                  MyPlayer(playerX)
                 ],
-              ),),),)
-        ,Expanded(
+              ),
+            ),
+          ),
+        ),
+        Expanded(
           child: Container(
             color: Colors.blueGrey,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-              MyButton(icon: Icons.arrow_forward,),
-              MyButton(icon: Icons.arrow_upward,),
-              MyButton(icon: Icons.arrow_downward,),
-
-            ]),
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  MyButton(icon: Icons.arrow_back, function: moveLeft),
+                  MyButton(icon: Icons.arrow_upward, function: moveUp),
+                  MyButton(icon: Icons.arrow_forward, function: moveRight),
+                ]),
           ),
-          
         )
       ],
-    ); 
+    );
   }
 }
