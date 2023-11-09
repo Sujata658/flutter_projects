@@ -3,6 +3,7 @@ const User = require("../models/userschema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookieparser");
+const Route = require("../models/routemodel");
 const router = express.Router();
 
 router.post("/signup", (req, res) => {
@@ -70,6 +71,29 @@ router.post("/login", async (req, res) => {
   }
   
 
+});
+
+router.post("/search", (req, res) => {
+  const { source, destination } = req.body;
+
+  console.log(source, destination);
+
+  if (!source || !destination) {
+    return res.status(422).json({ error: "Please fill all the fields" });
+  }
+
+  Route.find({
+    $and: [
+      { 'stops.name': source },
+      { 'stops.name': destination }
+    ]
+  }).then((data) => {
+      if (data.length === 0) {
+        return res.status(422).json({ error: "No matching routes found" });
+      }
+      res.status(200).json({ message: "Matching routes found", data: data });
+  });
+  
 });
 
 module.exports = router;
