@@ -1,0 +1,1 @@
+mongodb+srv://076bct085sujata:Major_v1@cluster0.hct8qld.mongodb.net/Major_v1?retryWrites=true&w=majority
