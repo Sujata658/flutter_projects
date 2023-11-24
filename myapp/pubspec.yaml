@@ -41,6 +41,7 @@ dependencies:
   latlong2: ^0.9.0
   url_launcher: ^6.2.1
   routing_client_dart: ^0.5.3
+  mapbox_gl: ^0.16.0
 
   
 
