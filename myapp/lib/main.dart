@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Pages/search.dart';
 import 'package:myapp/Pages/sign_up.dart';
 import 'package:myapp/Pages/login.dart';
 import 'package:myapp/Pages/home.dart';
@@ -19,13 +20,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MapPage(),
-      initialRoute: '/map',
+      // home: MapPage(),
+      initialRoute: '/home',
       routes: {
         '/signup': (context) => const SignUpPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const Home(),
-        '/map': (context) => MapPage(),
+        '/map': (context) => const MapPage(),
+        '/search': (context) => const SearchPage(),
       },
     );
   }
