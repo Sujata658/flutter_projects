@@ -4,6 +4,7 @@ import 'package:myapp/Pages/sign_up.dart';
 import 'package:myapp/Pages/login.dart';
 import 'package:myapp/Pages/home.dart';
 import 'package:myapp/Pages/map.dart';
+import 'package:myapp/Pages/welcome.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,9 +21,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      darkTheme: ThemeData.dark(), 
+      themeMode: ThemeMode.system,
       // home: MapPage(),
-      initialRoute: '/home',
+      initialRoute: '/welcome',
       routes: {
+        '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignUpPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const Home(),

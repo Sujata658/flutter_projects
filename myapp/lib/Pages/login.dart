@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:myapp/Pages/components/components.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -58,46 +60,54 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Page'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Email',
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const TopScreenImage(screenImageName: 'login.png'),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const ScreenTitle(title: 'Login'),
+                    CustomTextField(
+                      textField: TextField(
+                          controller: emailController,
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: const InputDecoration(hintText: 'Email')),
+                    ),
+                    CustomTextField(
+                      textField: TextField(
+                        obscureText: true,
+                        controller: passwordController,
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
+                        decoration: const InputDecoration(hintText: 'Password'),
+                      ),
+                    ),
+                    CustomButton(
+                      buttonText: 'Login',
+                      onPressed: () {
+                        final String email = emailController.text;
+                        final String password = passwordController.text;
+                        handlelogin(email, password, context);
+                      },
+                    ),
+                    CustomButton(buttonText: 'Sign Up',
+                    isOutlined:true, onPressed: () {
+                  Navigator.pushNamed(context, '/signup');
+                },)
+                  ],
+                ),
               ),
-              controller: emailController,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                final String email = emailController.text;
-                final String password = passwordController.text;
-                handlelogin(email, password, context);
-              },
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signup');
-              },
-              child: const Text('Sign Up'),
-            ),
-          ],
+            ]
+          ),
         ),
       ),
     );
