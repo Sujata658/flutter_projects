@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/Pages/search.dart';
+import 'package:myapp/Pages/home.dart';
 import 'package:myapp/Pages/sign_up.dart';
 import 'package:myapp/Pages/login.dart';
-import 'package:myapp/Pages/home.dart';
+import 'package:myapp/Pages/searchpage.dart';
 import 'package:myapp/Pages/map.dart';
 import 'package:myapp/Pages/welcome.dart';
 
@@ -23,8 +23,9 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData.dark(), 
       themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       // home: MapPage(),
-      initialRoute: '/welcome',
+      initialRoute: '/home',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignUpPage(),

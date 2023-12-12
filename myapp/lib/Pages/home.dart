@@ -1,140 +1,277 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:myapp/Pages/components/constants.dart';
+import 'package:myapp/Pages/searchpage.dart';
+import 'package:myapp/Pages/widgets/bottom_bar.dart';
+import 'package:myapp/Pages/widgets/const.dart';
+import 'widgets/places_card.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+  _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  TextEditingController startLocationController = TextEditingController();
-  TextEditingController destinationLocationController = TextEditingController();
-  var gdata = <Map<String, dynamic>>[];
+  int _selectedIndex = 0;
+  PageController _pageController = PageController();
 
-  @override
-  void dispose() {
-    startLocationController.dispose();
-    destinationLocationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> handleSearch(
-      String startingLocation, String destinationLocation, BuildContext context) async {
-    try {
-      var search = {
-        "source": startingLocation,
-        "destination": destinationLocation,
-      };
-
-      var response = await http.post(
-        Uri.parse('http://localhost:5000/search'),
-        body: json.encode(search),
-        headers: {"Content-Type": "application/json"},
-      );
-      var ldata = jsonDecode(response.body);
-
-      if (response.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ldata['error'])),
-        );
-      } else if (response.statusCode == 200) {
-        setState(() {
-          gdata = List<Map<String, dynamic>>.from(ldata['data']);
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ldata['message']),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
-    }
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _pageController.animateToPage(index,
+          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('HomePage'),
+      body: PageView(
+        controller: _pageController,
+        children: const [
+          HomePage(),
+          SearchPage(),
+          // NotificationsPage(),
+          // ProfilePage(),
+        ],
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: startLocationController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Starting Location',
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: BottomNavBar(
+        selectedIndex: _selectedIndex,
+        onTabTapped: _onTabTapped,
+      ),
+    );
+  }
+}
+
+
+class HomePage extends StatefulWidget {
+  const HomePage({
+    super.key,
+  });
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 15,
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: destinationLocationController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Destination Location',
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final String startLocation = startLocationController.text;
-                final String destinationLocation = destinationLocationController.text;
-                handleSearch(startLocation, destinationLocation, context);
-              },
-              child: const Text('Search'),
-            ),
-            if (gdata.isNotEmpty)
-  Expanded(
-    child: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        color: Colors.grey[200],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Search Results:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            for (var i = 0; i < gdata.length; i++)
-              ListTile(
-                title: Text('Route ${i + 1}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // const Header(),
+              SizedBox(
+                height: 310,
+                child: Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
                   children: [
-                    for (var stop in gdata[i]['stops'])
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          'Stop: ${stop['name']}, Fare: ${stop['fare']}, Distance: ${stop['distance']}, Time: ${stop['time']}',
+                    Hero(
+                      tag: 'blue_card',
+                      child: Material(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 270,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(15.0),
+                            ),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 30),
+                            child: Column(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Icon(
+                                            Icons.wb_sunny_outlined,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                          Text(
+                                            " 32℃",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        "24",
+                                        style: TextStyle(
+                                            height: 1.1,
+                                            fontSize: 50,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        "January",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            height: 0.2,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 20.0),
+                      child: Text('Perfect time to travel 🎏',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500)),
+                    ),
+                    Positioned(
+                        top: 0,
+                        right: 10,
+                        child: Image.asset(
+                          "assets/images/ladder.png",
+                          height: 180,
+                        ))
                   ],
                 ),
               ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 25),
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Recommended",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color:
+                            Theme.of(context).brightness == Brightness.light
+                                ? ktitlecolor
+                                : klightcolor,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 250,
+                child: ListView.builder(
+                  itemCount: recommend.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    return PlacesCard(
+                      product: recommend[index],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: 100,
+              ),
+            
+            ],
+          ),
         ),
       ),
-    ),
-  ),
+    );
+  }
+}
 
+class BottomNavBar extends StatefulWidget {
+  final int selectedIndex;
+  final Function(int) onTabTapped;
+
+  const BottomNavBar({
+    required this.selectedIndex,
+    required this.onTabTapped,
+  });
+
+  @override
+  State<BottomNavBar> createState() => _BottomNavBarState();
+}
+
+class _BottomNavBarState extends State<BottomNavBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        child: Container(
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              buildNavItem(0, Icons.home),
+              buildNavItem(1, Icons.search),
+              buildNavItem(2, Icons.add),
+              buildNavItem(3, Icons.notifications),
+              buildNavItem(4, Icons.person),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildNavItem(int index, IconData iconData) {
+    return GestureDetector(
+      onTap: () {
+        widget.onTabTapped(index);
+      },
+      child: SizedBox(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              iconData,
+              color: widget.selectedIndex == index ? ktextcolor : Colors.grey,
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+

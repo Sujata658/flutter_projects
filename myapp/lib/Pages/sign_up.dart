@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:myapp/Pages/components/components.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -45,7 +46,7 @@ class _SignUpPageState extends State<SignUpPage> {
           body: json.encode(newUser),
           headers: {"Content-Type": "application/json"},
         );
-        
+
         if (response.statusCode == 422) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(jsonDecode(response.body)['error'])),
@@ -58,9 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.pushNamed(context, '/login');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content:
-                    Text(response.body)),
+            SnackBar(content: Text(response.body)),
           );
         }
       } else {
@@ -78,66 +77,120 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _confirmPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Confirm Password',
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 24.0),
-            ElevatedButton(
-              onPressed: () {
-                final String name = _nameController.text;
-                final String email = _emailController.text;
-                final String phone = _phoneController.text;
-                final String password = _passwordController.text;
-                final String confirmPassword = _confirmPasswordController.text;
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const ScreenTitle(title: 'Sign Up'),
+                          CustomTextField(
+                            textField: TextField(
+                              controller: _nameController,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: const InputDecoration(
+                                hintText: 'Name',
+                              ),
+                            ),
+                          ),
+                          CustomTextField(
+                            textField: TextField(
+                              controller: _emailController,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: const InputDecoration(
+                                hintText: 'Email',
+                              ),
+                            ),
+                          ),
+                          CustomTextField(
+                            textField: TextField(
+                              controller: _phoneController,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: const InputDecoration(
+                                hintText: 'Phone',
+                              ),
+                            ),
+                          ),
+                          CustomTextField(
+                            textField: TextField(
+                              obscureText: true,
+                              controller: _passwordController,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: const InputDecoration(
+                                hintText: 'Password',
+                              ),
+                            ),
+                          ),
+                          CustomTextField(
+                            textField: TextField(
+                              controller: _confirmPasswordController,
+                              decoration: const InputDecoration(
+                                hintText: 'Confirm Password',
+                              ),
+                              obscureText: true,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          CustomButton(
+                              buttonText: 'Sign Up',
+                              onPressed: () {
+                                final String name = _nameController.text;
+                                final String email = _emailController.text;
+                                final String phone = _phoneController.text;
+                                final String password =
+                                    _passwordController.text;
+                                final String confirmPassword =
+                                    _confirmPasswordController.text;
 
-                handleSignUp(
-                    name, email, phone, password, confirmPassword, context);
-              },
-              child: const Text('Sign Up'),
-            ),
-          ],
+                                handleSignUp(name, email, phone, password,
+                                    confirmPassword, context);
+                              }),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Have an account?'),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/login');
+                                  },
+                                  child: const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline),
+                                  ))
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ]),
+          ),
         ),
       ),
     );

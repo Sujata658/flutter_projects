@@ -99,7 +99,13 @@ class CustomTextField extends StatelessWidget {
           color: ktextcolor,
         ),
       ),
-      child: textField,
+      child: TextField(
+        decoration: textField.decoration?.copyWith(
+          border: InputBorder.none,
+        ) ?? const InputDecoration(
+          border: InputBorder.none,
+        ),
+      )
     );
   }
 }

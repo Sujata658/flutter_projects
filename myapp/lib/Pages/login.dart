@@ -63,51 +63,68 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              const TopScreenImage(screenImageName: 'login.png'),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const ScreenTitle(title: 'Login'),
-                    CustomTextField(
-                      textField: TextField(
-                          controller: emailController,
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
-                          decoration: const InputDecoration(hintText: 'Email')),
-                    ),
-                    CustomTextField(
-                      textField: TextField(
-                        obscureText: true,
-                        controller: passwordController,
+          child: Column(children: [
+            const TopScreenImage(screenImageName: 'login.png'),
+            Expanded(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const ScreenTitle(title: 'Login'),
+                  CustomTextField(
+                    textField: TextField(
+                        controller: emailController,
                         style: const TextStyle(
                           fontSize: 20,
                         ),
-                        decoration: const InputDecoration(hintText: 'Password'),
+                        decoration: const InputDecoration(hintText: 'Email')),
+                  ),
+                  CustomTextField(
+                    textField: TextField(
+                      obscureText: true,
+                      controller: passwordController,
+                      style: const TextStyle(
+                        fontSize: 20,
                       ),
+                      decoration: const InputDecoration(hintText: 'Password'),
                     ),
-                    CustomButton(
-                      buttonText: 'Login',
-                      onPressed: () {
-                        final String email = emailController.text;
-                        final String password = passwordController.text;
-                        handlelogin(email, password, context);
-                      },
-                    ),
-                    CustomButton(buttonText: 'Sign Up',
-                    isOutlined:true, onPressed: () {
-                  Navigator.pushNamed(context, '/signup');
-                },)
-                  ],
-                ),
+                  ),
+                  CustomButton(
+                    buttonText: 'Login',
+                    onPressed: () {
+                      final String email = emailController.text;
+                      final String password = passwordController.text;
+                      handlelogin(email, password, context);
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Forgot Password?'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/signup');
+                          },
+                          child: const Text(
+                            'Sign Up',
+                            style:
+                                TextStyle(decoration: TextDecoration.underline),
+                          ))
+                    ],
+                  )
+
+                  //     CustomButton(buttonText: 'Sign Up',
+                  //     isOutlined:true, onPressed: () {
+                  //   Navigator.pushNamed(context, '/signup');
+                  // },)
+                ],
               ),
-            ]
-          ),
+            ),
+          ]),
         ),
       ),
     );
