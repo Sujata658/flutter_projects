@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const stopSchema = new mongoose.Schema({
   lat: { type: Number, required: true },
@@ -8,4 +8,4 @@ const stopSchema = new mongoose.Schema({
 
 const Stop = mongoose.models.Stop || mongoose.model("Stop", stopSchema);
 
-export default Stop;
+module.exports = Stop;
