@@ -7,6 +7,8 @@ const cookieParser = require("cookieparser");
 const Route = require("../models/routeModels");
 const router = express.Router();
 const Notification = require("../models/notificationSchema");
+const Fare = require("../models/fareModels");
+const Bus = require("../models/busSchema");
 
 const { stopToId } = require("../routes/helper");
 
@@ -19,21 +21,25 @@ router.post("/search", async (req, res) => {
     if (!source || !destination) {
       return res.status(422).json({ error: "Please fill all the fields" });
     }
-
-    console.log("here at line 80");
     source = await stopToId(source);
     destination = await stopToId(destination);
-    console.log("id of searched stops", source, destination);
 
-    const data = await Route.find({
-      stops_list: { $all: [source, destination] },
-    }).select("name");
+    const data = await Fare.find({
+      starting: source,
+      ending: destination,
+    });
+
     console.log(data);
 
     if (data.length === 0) {
       console.log("No matching routes found");
       return res.status(422).json({ error: "No matching routes found" });
     }
+
+    // Process the found routes as needed
+    return res
+      .status(200)
+      .json({ message: "Matching routes found", data: data });
 
     console.log("routes found");
 
@@ -68,9 +74,60 @@ router.post("/send-notification", async (req, res) => {
     res.status(500).json({ error: "Failed to send notification" });
   }
 });
+router.post("/addFare", async (req, res) => {
+  try {
+    const { starting, ending, rate, bus } = req.body;
+
+    if (!starting || !ending || !rate || !bus) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const newFare = new Fare({
+      starting,
+      ending,
+      rate,
+      bus,
+    });
+
+    await newFare.save();
+
+    // You can also send FCM Fare here if needed
+
+    res.json({ success: true, message: newFare });
+  } catch (error) {
+    console.error("Error sending Fare:", error);
+    res.status(500).json({ error: "Failed to send Fare" });
+  }
+});
+router.post("/addVehicle", async (req, res) => {
+  try {
+    const { bid, name, type, direction, route } = req.body;
+
+    if (!bid || !name || !type || !direction || !route) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const newVehicle = new Bus({
+      bid,
+      name,
+      type,
+      direction,
+      route,
+    });
+
+    await newVehicle.save();
+
+    // You can also send FCM Vehicle here if needed
+
+    res.json({ success: true, message: newVehicle });
+  } catch (error) {
+    console.error("Error creating Vehicle:", error);
+    res.status(500).json({ error: "Failed to send Vehicle" });
+  }
+});
 
 // Endpoint to get all notifications
-router.get("/notifications", async (req, res) => {
+router.get("/addVehicle", async (req, res) => {
   try {
     const notifications = await Notification.find();
     res.json(notifications);

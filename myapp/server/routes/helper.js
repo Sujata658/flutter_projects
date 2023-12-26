@@ -3,11 +3,13 @@ const route = require("../models/routeModels.js");
 
 const stopToId = async (stopname) => {
   try {
-    const foundStop = await Stop.find({ name: stopname });
+    const foundStop = await Stop.findOne({ name: stopname })
+      .select({ _id: 0, id: 1 })
+      .lean();
 
-    if (foundStop.length > 0) {
-      console.log("found stop's name from id ", foundStop[0].name);
-      return foundStop[0].id;
+    if (foundStop) {
+      console.log("found stop's id from id ", foundStop);
+      return foundStop.id;
     } else {
       console.error("no such stop line 12 at helper.js");
       // throw new Error("No such stop");
@@ -17,7 +19,7 @@ const stopToId = async (stopname) => {
     throw new Error("Internal Server Error"); // or handle in a way appropriate for your application
   }
 };
-stopToId("Kumaripati");
+
 console.log();
 
 const routeToId = async (routename) => {

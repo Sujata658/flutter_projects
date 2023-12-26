@@ -1,0 +1,16 @@
+[
+  {
+    "bid": "SY0",
+    "name": "Sajha Yatayar",
+    "type": "Bus",
+    "direction": "none",
+    "route": "L2NBP"
+  },
+  {
+    "bid": "SY1",
+    "name": "Sajha Yatayar",
+    "type": "Bus",
+    "direction": "none",
+    "route": "L2B"
+  }
+]
