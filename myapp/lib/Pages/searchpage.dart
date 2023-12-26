@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -23,8 +22,8 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  Future<void> handleSearch(
-      String startingLocation, String destinationLocation, BuildContext context) async {
+  Future<void> handleSearch(String startingLocation, String destinationLocation,
+      BuildContext context) async {
     try {
       var search = {
         "source": startingLocation,
@@ -66,7 +65,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SearchPagePage'),
+        title: const Text('SearchPage'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,48 +89,48 @@ class _SearchPageState extends State<SearchPage> {
             ElevatedButton(
               onPressed: () {
                 final String startLocation = startLocationController.text;
-                final String destinationLocation = destinationLocationController.text;
+                final String destinationLocation =
+                    destinationLocationController.text;
                 handleSearch(startLocation, destinationLocation, context);
               },
               child: const Text('Search'),
             ),
             if (gdata.isNotEmpty)
-  Expanded(
-    child: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        color: Colors.grey[200],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Search Results:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            for (var i = 0; i < gdata.length; i++)
-              ListTile(
-                title: Text('Route ${i + 1}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var stop in gdata[i]['stops'])
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          'Stop: ${stop['name']}, Fare: ${stop['fare']}, Distance: ${stop['distance']}, Time: ${stop['time']}',
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    color: Colors.grey[200],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Search Results:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                  ],
+                        const SizedBox(height: 8),
+                        for (var i = 0; i < gdata.length; i++)
+                          ListTile(
+                            title: Text('Route ${i + 1}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var stop in gdata[i]['stops'])
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      'Stop: ${stop['name']}, Fare: ${stop['fare']}, Distance: ${stop['distance']}, Time: ${stop['time']}',
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-          ],
-        ),
-      ),
-    ),
-  ),
-
           ],
         ),
       ),

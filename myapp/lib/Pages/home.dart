@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/components/constants.dart';
 import 'package:myapp/Pages/searchpage.dart';
-import 'package:myapp/Pages/widgets/bottom_bar.dart';
 import 'package:myapp/Pages/widgets/const.dart';
 import 'widgets/places_card.dart';
 
@@ -124,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                                         ],
                                       ),
                                       Text(
-                                        "24",
+                                        "13",
                                         style: TextStyle(
                                             height: 1.1,
                                             fontSize: 50,
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                                             fontWeight: FontWeight.w500),
                                       ),
                                       Text(
-                                        "January",
+                                        "December",
                                         style: TextStyle(
                                             fontSize: 12,
                                             height: 0.2,

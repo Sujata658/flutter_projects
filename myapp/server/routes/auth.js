@@ -74,6 +74,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/search", (req, res) => {
+  console.log('reached search api')
   const { source, destination } = req.body;
 
   console.log(source, destination);
