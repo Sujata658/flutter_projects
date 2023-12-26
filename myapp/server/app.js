@@ -7,8 +7,8 @@ dotenv.config({ path: "./config.env" });
 
 require("./DB/connect");
 app.use(express.json());
-app.use(require('./routes/auth'));
-
+app.use(require("./routes/auth"));
+// app.use(require("./routes/notification"));
 
 app.listen(port, () => {
   console.log(`server connected at port ${port}`);

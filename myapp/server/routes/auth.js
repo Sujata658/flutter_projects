@@ -6,10 +6,9 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookieparser");
 const Route = require("../models/routeModels");
 const router = express.Router();
+const Notification = require("../models/notificationSchema");
 
 const { stopToId } = require("../routes/helper");
-
-// ... (other code)
 
 router.post("/search", async (req, res) => {
   try {
@@ -29,6 +28,7 @@ router.post("/search", async (req, res) => {
     const data = await Route.find({
       stops_list: { $all: [source, destination] },
     }).select("name");
+    console.log(data);
 
     if (data.length === 0) {
       console.log("No matching routes found");
@@ -41,6 +41,42 @@ router.post("/search", async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Endpoint to send a notification
+router.post("/send-notification", async (req, res) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title || !title) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const newNotification = new Notification({
+      title,
+      description,
+    });
+
+    await newNotification.save();
+
+    // You can also send FCM notification here if needed
+
+    res.json({ success: true, message: "newNotification" });
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    res.status(500).json({ error: "Failed to send notification" });
+  }
+});
+
+// Endpoint to get all notifications
+router.get("/notifications", async (req, res) => {
+  try {
+    const notifications = await Notification.find();
+    res.json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
 
