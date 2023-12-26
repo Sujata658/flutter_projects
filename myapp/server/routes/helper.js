@@ -1,5 +1,6 @@
 const Stop = require("../models/stopModels.js");
 const route = require("../models/routeModels.js");
+const Bus = require("../models/busSchema.js");
 
 const stopToId = async (stopname) => {
   try {
@@ -37,4 +38,59 @@ const routeToId = async (routename) => {
     console.log(err);
   }
 };
-module.exports = { routeToId, stopToId };
+
+const busIdToBus = async (busId) => {
+  try {
+    console.log("busid", busId);
+    const foundbus = await Bus.findOne({ bid: busId });
+
+    if (foundbus) {
+      console.log("found bus's  from id ", foundbus);
+      return foundbus;
+    } else {
+      console.error("no such bus");
+      res.status(400).json({ Err: "No such bus" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const routeIdToroute = async (routeId) => {
+  try {
+    console.log("routeid", routeId);
+    const foundroute = await route.findOne({ id: routeId }).select({ _id: 0 });
+
+    if (foundroute) {
+      console.log("found route's  from id ", foundroute);
+      return foundroute;
+    } else {
+      console.error("no such route");
+      res.status(400).json({ Err: "No such route" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const stopIdToStop = async (stopId) => {
+  try {
+    console.log("routeid", stopId);
+    const foundstop = await stop.findOne({ id: stopId }).select({ _id: 0 });
+
+    if (foundstop) {
+      console.log("found stop's  from id ", foundstop);
+      return foundstop;
+    } else {
+      console.error("no such stop");
+      res.status(400).json({ Err: "No such stop" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+module.exports = {
+  routeToId,
+  stopToId,
+  busIdToBus,
+  routeIdToroute,
+  stopIdToStop,
+};

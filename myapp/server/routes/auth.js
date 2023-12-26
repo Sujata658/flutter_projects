@@ -10,7 +10,7 @@ const Notification = require("../models/notificationSchema");
 const Fare = require("../models/fareModels");
 const Bus = require("../models/busSchema");
 
-const { stopToId } = require("../routes/helper");
+const { stopToId, busIdToBus, routeIdToroute } = require("../routes/helper");
 
 router.post("/search", async (req, res) => {
   try {
@@ -35,11 +35,21 @@ router.post("/search", async (req, res) => {
       console.log("No matching routes found");
       return res.status(422).json({ error: "No matching routes found" });
     }
+    const busId = data[0].bus;
+    const foundBus = await busIdToBus(busId);
+    const routeId = foundBus.route;
+    const foundRoute = await routeIdToroute(routeId);
+    console.log("found route", foundRoute);
+    const stops = foundRoute.stops_list;
 
     // Process the found routes as needed
-    return res
-      .status(200)
-      .json({ message: "Matching routes found", data: data });
+    return res.status(200).json({
+      message: "Matching routes found",
+      data: data,
+      rate: data[0].rate,
+      bus: foundBus.name,
+      route: foundRoute.name,
+    });
 
     console.log("routes found");
 
