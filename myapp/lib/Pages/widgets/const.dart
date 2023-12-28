@@ -16,7 +16,7 @@ const colors = [
 ];
 
 const recommend = [
-  {'image': 'assets/images/login.png', 'color': Color(0xFFFFEBF4)},
-  {'image': 'assets/images/ladder.png', 'color': Color(0xFF9BDDE1)},
+  {'image': 'assets/images/vehicles/sajha.jpg', 'color': Color(0xFFFFEBF4)},
+  {'image': 'assets/images/vehicles/NY.jpg', 'color': Color(0xFF9BDDE1)},
   {'image': 'assets/images/splash.png', 'color': Color(0xFF9BDDE1)},
 ];

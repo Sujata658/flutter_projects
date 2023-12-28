@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Pages/components/bottomnav.dart';
 import 'package:myapp/Pages/components/constants.dart';
+import 'package:myapp/Pages/map.dart';
+import 'package:myapp/Pages/notifications.dart';
+import 'package:myapp/Pages/profile.dart';
 import 'package:myapp/Pages/searchpage.dart';
 import 'package:myapp/Pages/widgets/const.dart';
 import 'widgets/places_card.dart';
@@ -13,13 +17,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
 
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
       _pageController.animateToPage(index,
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     });
   }
 
@@ -31,8 +35,9 @@ class _HomeState extends State<Home> {
         children: const [
           HomePage(),
           SearchPage(),
-          // NotificationsPage(),
-          // ProfilePage(),
+          MapPage(),
+          NotificationPage(),
+          ProfilePage(),
         ],
         onPageChanged: (index) {
           setState(() {
@@ -49,7 +54,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
@@ -60,6 +64,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String _getMonthName(int month) {
+  switch (month) {
+    case 1:
+      return 'January';
+    case 2:
+      return 'February';
+    case 3:
+      return 'March';
+    case 4:
+      return 'April';
+    case 5:
+      return 'May';
+    case 6:
+      return 'June';
+    case 7:
+      return 'July';
+    case 8:
+      return 'August';
+    case 9:
+      return 'September';
+    case 10:
+      return 'October';
+    case 11:
+      return 'November';
+    case 12:
+      return 'December';
+    default:
+      return '';
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -71,7 +106,6 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 15,
               ),
-              // const Header(),
               SizedBox(
                 height: 310,
                 child: Stack(
@@ -89,18 +123,16 @@ class _HomePageState extends State<HomePage> {
                             ),
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 30),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 30),
                             child: Column(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 30, vertical: 10),
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -108,14 +140,15 @@ class _HomePageState extends State<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
                                         children: [
-                                          Icon(
-                                            Icons.wb_sunny_outlined,
+                                          const Icon(
+                                            Icons.location_city,
                                             color: Colors.white,
                                             size: 20,
                                           ),
+                                          
                                           Text(
-                                            " 32℃",
-                                            style: TextStyle(
+                                            '${DateTime.now().hour}:${DateTime.now().minute}',
+                                            style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.white,
                                             ),
@@ -123,20 +156,22 @@ class _HomePageState extends State<HomePage> {
                                         ],
                                       ),
                                       Text(
-                                        "13",
-                                        style: TextStyle(
-                                            height: 1.1,
-                                            fontSize: 50,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500),
+                                        '${DateTime.now().day}',
+                                        style: const TextStyle(
+                                          height: 1.1,
+                                          fontSize: 50,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                       Text(
-                                        "December",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            height: 0.2,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500),
+                                        _getMonthName(DateTime.now().month),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          height: 0.2,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -170,13 +205,12 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Recommended",
+                    "Explore Routes",
                     style: TextStyle(
                         fontSize: 20,
-                        color:
-                            Theme.of(context).brightness == Brightness.light
-                                ? ktitlecolor
-                                : klightcolor,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? ktitlecolor
+                            : klightcolor,
                         fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -196,7 +230,6 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 100,
               ),
-            
             ],
           ),
         ),
@@ -204,73 +237,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-class BottomNavBar extends StatefulWidget {
-  final int selectedIndex;
-  final Function(int) onTabTapped;
-
-  const BottomNavBar({
-    required this.selectedIndex,
-    required this.onTabTapped,
-  });
-
-  @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
-}
-
-class _BottomNavBarState extends State<BottomNavBar> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: Container(
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              buildNavItem(0, Icons.home),
-              buildNavItem(1, Icons.search),
-              buildNavItem(2, Icons.add),
-              buildNavItem(3, Icons.notifications),
-              buildNavItem(4, Icons.person),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildNavItem(int index, IconData iconData) {
-    return GestureDetector(
-      onTap: () {
-        widget.onTabTapped(index);
-      },
-      child: SizedBox(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              iconData,
-              color: widget.selectedIndex == index ? ktextcolor : Colors.grey,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-

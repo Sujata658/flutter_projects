@@ -95,7 +95,16 @@ class _SignUpPageState extends State<SignUpPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const ScreenTitle(title: 'Sign Up'),
+                          const Row(mainAxisAlignment: MainAxisAlignment.center,
+
+                            children: [Icon(
+                            Icons.person_add_outlined,
+                            size: 50,
+                          ),
+                          ScreenTitle(title: ' Sign Up'),],
+
+                          ),
+                          
                           CustomTextField(
                             textField: TextField(
                               controller: _nameController,

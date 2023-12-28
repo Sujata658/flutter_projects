@@ -1,7 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:myapp/Pages/components/components.dart';
+import 'package:myapp/Pages/components/constants.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   TextEditingController startLocationController = TextEditingController();
   TextEditingController destinationLocationController = TextEditingController();
-  var gdata = <Map<String, dynamic>>[];
+  Map<String, dynamic> gdata = {};
 
   @override
   void dispose() {
@@ -37,20 +38,11 @@ class _SearchPageState extends State<SearchPage> {
       );
       var ldata = jsonDecode(response.body);
 
-      if (response.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ldata['error'])),
-        );
-      } else if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+
         setState(() {
-          gdata = List<Map<String, dynamic>>.from(ldata['data']);
+          gdata = ldata;
         });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ldata['message']),
-          ),
-        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,70 +56,90 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SearchPage'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextField(
+            CustomTextField(textField: TextField(
               controller: startLocationController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Starting Location',
+                hintText: 'Starting Location',
               ),
-            ),
+            ),),
+            
             const SizedBox(height: 16),
-            TextField(
+            CustomTextField(textField: TextField(
               controller: destinationLocationController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Destination Location',
+                hintText: 'Destination Location',
+              ),
+            ),),
+            
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  final String startLocation = startLocationController.text;
+                  final String destinationLocation =
+                      destinationLocationController.text;
+                  handleSearch(startLocation, destinationLocation, context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ktextcolor,
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize
+                      .min, 
+                  children: [
+                    Icon(Icons.search, color: Colors.white), 
+                    SizedBox(width: 8.0), 
+                    Text(
+                      'Search',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                final String startLocation = startLocationController.text;
-                final String destinationLocation =
-                    destinationLocationController.text;
-                handleSearch(startLocation, destinationLocation, context);
-              },
-              child: const Text('Search'),
-            ),
-            if (gdata.isNotEmpty)
+            if (gdata.isNotEmpty && gdata['message'] == "Matching routes found")
               Expanded(
                 child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    color: Colors.grey[200],
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Search Results:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        for (var i = 0; i < gdata.length; i++)
-                          ListTile(
-                            title: Text('Route ${i + 1}'),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Search Results:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      for (var routeData in gdata['data'])
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: ListTile(
+                            title: Text('Route: ${routeData['route']}', style: TextStyle(fontWeight: FontWeight.bold, color: ktextcolor)),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                for (var stop in gdata[i]['stops'])
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 4),
-                                    child: Text(
-                                      'Stop: ${stop['name']}, Fare: ${stop['fare']}, Distance: ${stop['distance']}, Time: ${stop['time']}',
-                                    ),
-                                  ),
+                                Text('Rate: Rs. ${routeData['rate']}', style: const TextStyle(color: Color.fromRGBO(0, 0, 0, 1)),),
+                                Text('Bus: ${routeData['bus']}',style: const TextStyle(color: Colors.black),),
                               ],
                             ),
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                 ),
               ),

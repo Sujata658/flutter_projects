@@ -74,11 +74,12 @@ class _LoginPageState extends State<LoginPage> {
                   const ScreenTitle(title: 'Login'),
                   CustomTextField(
                     textField: TextField(
-                        controller: emailController,
-                        style: const TextStyle(
-                          fontSize: 20,
-                        ),
-                        decoration: const InputDecoration(hintText: 'Email')),
+                      style: const TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: const InputDecoration(hintText: 'Email'),
+                      controller: emailController,
+                    ),
                   ),
                   CustomTextField(
                     textField: TextField(
@@ -95,6 +96,8 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       final String email = emailController.text;
                       final String password = passwordController.text;
+                      // print(email);
+                      // print(password);
                       handlelogin(email, password, context);
                     },
                   ),
@@ -116,11 +119,6 @@ class _LoginPageState extends State<LoginPage> {
                           ))
                     ],
                   )
-
-                  //     CustomButton(buttonText: 'Sign Up',
-                  //     isOutlined:true, onPressed: () {
-                  //   Navigator.pushNamed(context, '/signup');
-                  // },)
                 ],
               ),
             ),

@@ -100,12 +100,14 @@ class CustomTextField extends StatelessWidget {
         ),
       ),
       child: TextField(
+        obscureText: textField.obscureText,
+        controller: textField.controller,  
         decoration: textField.decoration?.copyWith(
           border: InputBorder.none,
         ) ?? const InputDecoration(
           border: InputBorder.none,
         ),
-      )
+      ),
     );
   }
 }
