@@ -82,6 +82,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/search", async (req, res) => {
   try {
+    let dir = 0;
     let { source, destination } = req.body;
 
     console.log(source, destination);
@@ -100,8 +101,41 @@ router.post("/search", async (req, res) => {
     console.log(data);
 
     if (data.length === 0) {
-      console.log("No matching routes found");
-      return res.status(422).json({ error: "No matching routes found" });
+      const data2 = await Fare.find({
+        starting: destination,
+        ending: source,
+      });
+
+      if (data2.length === 0) {
+        console.log("No matching routes found");
+        return res.status(422).json({ error: "No matching routes found" });
+      } else {
+        const responseData = data2.map(async (fare) => {
+          const busId = fare.bus;
+          const foundBus = await busIdToBus(busId);
+          const routeId = foundBus.route;
+          const foundRoute = await routeIdToroute(routeId);
+
+          return {
+            rate: fare.rate,
+            bus: foundBus.name,
+            route: foundRoute.name,
+            routeId: routeId,
+            busId: busId,
+          };
+        });
+
+        // Wait for all promises in the responseData array to resolve
+        const resolvedData = await Promise.all(responseData);
+        console.log("no of found routes ", resolvedData.length);
+        console.log("found routes", resolvedData);
+
+        // Process the found routes as needed
+        return res.status(200).json({
+          message: "Matching routes found",
+          data: resolvedData,
+        });
+      }
     }
 
     const responseData = data.map(async (fare) => {
