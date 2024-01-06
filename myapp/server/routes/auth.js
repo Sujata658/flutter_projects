@@ -35,13 +35,10 @@ router.post("/signup", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-
-  
 });
 
-
 router.post("/login", async (req, res) => {
-  try{
+  try {
     const { email, password } = req.body;
     // console.log(req.body)
 
@@ -52,33 +49,29 @@ router.post("/login", async (req, res) => {
     const userLogin = await User.findOne({ email: email });
     // console.log(userLogin);
 
-    if(userLogin){
+    if (userLogin) {
       const isMatch = await bcrypt.compare(password, userLogin.password);
 
-      if(!isMatch){
-        res.status(400).json({error: "Invalid credentials"});
-      }else{
+      if (!isMatch) {
+        res.status(400).json({ error: "Invalid credentials" });
+      } else {
         const token = await userLogin.generateAuthToken();
         // console.log(token);
 
         res.cookie("jwtoken", token, {
           expires: new Date(Date.now() + 25892000000),
-          httpOnly: true
+          httpOnly: true,
         });
 
-        res.status(200).json({message: "User logged in successfully"});
+        res.status(200).json({ message: "User logged in successfully" });
       }
-    }else{
+    } else {
       res.status(400).json({ error: "Invalid credentials" });
     }
-
-  }catch (err) {
+  } catch (err) {
     console.log(err);
   }
-  
-
 });
-
 
 router.post("/search", async (req, res) => {
   try {
@@ -183,7 +176,6 @@ router.post("/send-notification", async (req, res) => {
 
     await newNotification.save();
 
-
     res.json({ success: true, message: "newNotification" });
   } catch (error) {
     console.error("Error sending notification:", error);
@@ -199,7 +191,6 @@ router.get("/notifications", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
-
 
 router.post("/addFare", async (req, res) => {
   try {
@@ -218,46 +209,10 @@ router.post("/addFare", async (req, res) => {
 
     await newFare.save();
 
-
     res.json({ success: true, message: newFare });
   } catch (error) {
     console.error("Error sending Fare:", error);
     res.status(500).json({ error: "Failed to send Fare" });
-  }
-});
-router.post("/addVehicle", async (req, res) => {
-  try {
-    const { bid, name, type, direction, route } = req.body;
-
-    if (!bid || !name || !type || !direction || !route) {
-      return res.status(400).json({ error: "Missing required parameters" });
-    }
-
-    const newVehicle = new Bus({
-      bid,
-      name,
-      type,
-      direction,
-      route,
-    });
-
-    await newVehicle.save();
-
-
-    res.json({ success: true, message: newVehicle });
-  } catch (error) {
-    console.error("Error creating Vehicle:", error);
-    res.status(500).json({ error: "Failed to send Vehicle" });
-  }
-});
-
-router.get("/addVehicle", async (req, res) => {
-  try {
-    const notifications = await Notification.find();
-    res.json(notifications);
-  } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
 
