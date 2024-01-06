@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Pages/admin.dart';
 import 'package:myapp/Pages/home.dart';
 import 'package:myapp/Pages/sign_up.dart';
 import 'package:myapp/Pages/login.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       // home: MapPage(),
-      initialRoute: '/welcome',
+      initialRoute: '/admin',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignUpPage(),
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const Home(),
         '/map': (context) => const MapPage(),
         '/search': (context) => const SearchPage(),
+        '/admin': (context) => const AdminDash(),
       },
     );
   }
