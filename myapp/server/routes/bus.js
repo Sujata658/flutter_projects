@@ -36,5 +36,15 @@ router.get("/vehicles", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch vehicles" });
   }
 });
+router.get("/vehicleslist", async (req, res) => {
+  try {
+    const vehicles = await Bus.find();
+    const vehicleNames = vehicles.map((vehicle) => vehicle.name);
+    res.json({ vehicleNames });
+  } catch (error) {
+    console.error("Error fetching vehicles:", error);
+    res.status(500).json({ error: "Failed to fetch vehicles" });
+  }
+});
 
 module.exports = router;

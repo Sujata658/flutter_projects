@@ -1,39 +1,38 @@
-const Bus = require("../models/busSchema");
+const Fare = require("../models/fareModels");
 const express = require("express");
 const router = express.Router();
 
-router.post("/addVehicle", async (req, res) => {
+router.post("/addFare", async (req, res) => {
   try {
-    const { bid, name, type, direction, route } = req.body;
+    const { starting, ending, rate, bus } = req.body;
 
-    if (!bid || !name || !type || !direction || !route) {
+    if (!starting || !ending || !rate || !bus) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
-    const newVehicle = new Bus({
-      bid,
-      name,
-      type,
-      direction,
-      route,
+    const newFare = new Fare({
+      starting,
+      ending,
+      rate,
+      bus,
     });
 
-    await newVehicle.save();
+    await newFare.save();
 
-    res.json({ success: true, message: newVehicle });
+    res.json({ success: true, message: newFare });
   } catch (error) {
-    console.error("Error creating Vehicle:", error);
-    res.status(500).json({ error: "Failed to send Vehicle" });
+    console.error("Error creating Fare:", error);
+    res.status(500).json({ error: "Failed to send Fare" });
   }
 });
 
-router.get("/vehicles", async (req, res) => {
+router.get("/Fares", async (req, res) => {
   try {
-    const vehicles = await Bus.find();
-    res.json({ vehicles });
+    const Fares = await Fare.find();
+    res.json({ Fares });
   } catch (error) {
-    console.error("Error fetching vehicles:", error);
-    res.status(500).json({ error: "Failed to fetch vehicles" });
+    console.error("Error fetching Fares:", error);
+    res.status(500).json({ error: "Failed to fetch Fares" });
   }
 });
 

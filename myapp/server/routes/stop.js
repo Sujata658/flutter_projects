@@ -34,5 +34,15 @@ router.get("/stops", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch stops" });
   }
 });
+router.get("/stopsList", async (req, res) => {
+  try {
+    const stops = await Stop.find();
+    const stopsName = stops.map((stop) => stop.name);
+    res.json({ stopsName });
+  } catch (error) {
+    console.error("Error fetching stops:", error);
+    res.status(500).json({ error: "Failed to fetch stops" });
+  }
+});
 
 module.exports = router;
