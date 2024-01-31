@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/components/bottomnav.dart';
 import 'package:myapp/Pages/components/constants.dart';
-import 'package:myapp/Pages/map.dart';
-import 'package:myapp/Pages/notifications.dart';
-import 'package:myapp/Pages/profile.dart';
-import 'package:myapp/Pages/searchpage.dart';
+import 'package:myapp/Pages/homepages/map.dart';
+import 'package:myapp/Pages/homepages/notifications.dart';
+import 'package:myapp/Pages/homepages/profile.dart';
+import 'package:myapp/Pages/homepages/searchpage.dart';
 import 'package:myapp/Pages/widgets/const.dart';
-import 'widgets/places_card.dart';
+import '../widgets/places_card.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);

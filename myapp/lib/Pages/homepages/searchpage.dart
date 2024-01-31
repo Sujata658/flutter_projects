@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/Pages/components/components.dart';
 import 'package:myapp/Pages/components/constants.dart';
+import 'package:myapp/Pages/supportpages/routedetail.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -49,8 +50,6 @@ class _SearchPageState extends State<SearchPage> {
         setState(() {
           gdata = jsonDecode(response.body);
         });
-      } else {
-        print(jsonDecode(response.body)['message']);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,34 +91,45 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     } else if (hasSearched) {
-      return const Center(child: Text('No matching routes found.'));
+      return Center(child: Text('No matching routes found.'));
     } else {
       return Container();
     }
   }
 
   Widget _buildRouteItem(dynamic routeData) {
+    
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
       ),
-      child: ListTile(
-        title: Text('Route: ${routeData['route']}',
-            style: TextStyle(fontWeight: FontWeight.bold, color: ktextcolor)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Rate: Rs. ${routeData['rate']}',
-              style: const TextStyle(color: Colors.black),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RouteDetail(routeID: routeData['routeId']),
             ),
-            Text(
-              'Bus: ${routeData['bus']}',
-              style: const TextStyle(color: Colors.black),
-            ),
-          ],
+          );
+        },
+        child: ListTile(
+          title: Text('Route: ${routeData['route']}',
+              style: TextStyle(fontWeight: FontWeight.bold, color: ktextcolor)),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Rate: Rs. ${routeData['rate']}',
+                style: const TextStyle(color: Colors.black),
+              ),
+              Text(
+                'Bus: ${routeData['bus']}',
+                style: const TextStyle(color: Colors.black),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -133,8 +143,13 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SearchBarApp(controller: startLocationController),
-            SearchBarApp(controller: destinationLocationController),
+            SearchBarApp(
+                controller: startLocationController,
+                hintText: "Start Location"),
+            SearchBarApp(
+              controller: destinationLocationController,
+              hintText: "Destination Location",
+            ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {

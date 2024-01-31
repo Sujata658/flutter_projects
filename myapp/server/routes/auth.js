@@ -9,6 +9,8 @@ const Notification = require("../models/notificationSchema");
 const Fare = require("../models/fareModels");
 const Bus = require("../models/busSchema");
 
+const Stop = require("../models/stopModels");
+
 const { stopToId, busIdToBus, routeIdToroute } = require("../routes/helper");
 
 router.post("/signup", (req, res) => {
@@ -98,7 +100,7 @@ router.post("/search", async (req, res) => {
       ending: destination,
     });
 
-    console.log(data);
+    // console.log(data);
 
     if (data.length === 0) {
       const data2 = await Fare.find({
@@ -191,67 +193,6 @@ router.post("/send-notification", async (req, res) => {
   }
 });
 router.get("/notifications", async (req, res) => {
-  try {
-    const notifications = await Notification.find();
-    res.json(notifications);
-  } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res.status(500).json({ error: "Failed to fetch notifications" });
-  }
-});
-
-
-router.post("/addFare", async (req, res) => {
-  try {
-    const { starting, ending, rate, bus } = req.body;
-
-    if (!starting || !ending || !rate || !bus) {
-      return res.status(400).json({ error: "Missing required parameters" });
-    }
-
-    const newFare = new Fare({
-      starting,
-      ending,
-      rate,
-      bus,
-    });
-
-    await newFare.save();
-
-
-    res.json({ success: true, message: newFare });
-  } catch (error) {
-    console.error("Error sending Fare:", error);
-    res.status(500).json({ error: "Failed to send Fare" });
-  }
-});
-router.post("/addVehicle", async (req, res) => {
-  try {
-    const { bid, name, type, direction, route } = req.body;
-
-    if (!bid || !name || !type || !direction || !route) {
-      return res.status(400).json({ error: "Missing required parameters" });
-    }
-
-    const newVehicle = new Bus({
-      bid,
-      name,
-      type,
-      direction,
-      route,
-    });
-
-    await newVehicle.save();
-
-
-    res.json({ success: true, message: newVehicle });
-  } catch (error) {
-    console.error("Error creating Vehicle:", error);
-    res.status(500).json({ error: "Failed to send Vehicle" });
-  }
-});
-
-router.get("/addVehicle", async (req, res) => {
   try {
     const notifications = await Notification.find();
     res.json(notifications);

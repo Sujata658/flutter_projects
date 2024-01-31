@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:baato_api/models/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -15,6 +17,8 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   List<LatLng> decodedRoutePoints = [];
+  
+  get http => null;
   @override
   Widget build(BuildContext context) {
     List<LatLng> decodePolyline(String encoded) {
@@ -53,8 +57,23 @@ class _MapPageState extends State<MapPage> {
 
     findRoutes() async {
       var points = [];
+
+      try{
+        final response = await http.get(Uri.parse('http://localhost:5000/search'));
+        if(response.statusCode == 200){
+          final data = jsonDecode(response.body);
+          points = data['data'];
+        }
+      } catch(e){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+
+
       points.add("27.717844,85.3248188");
-      points.add("27.727266,85.317497");
       points.add("27.6876224,85.33827");
 
 

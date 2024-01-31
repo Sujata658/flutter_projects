@@ -49,7 +49,7 @@ const busIdToBus = async (busId) => {
       return foundbus;
     } else {
       console.error("no such bus");
-      res.status(400).json({ Err: "No such bus" });
+      // res.status(400).json({ Err: "No such bus" });
     }
   } catch (err) {
     console.log(err);
@@ -87,11 +87,27 @@ const stopIdToStop = async (stopId) => {
     console.log(err);
   }
 };
+const stopIdToStopName = async (stopId) => {
+  try {
+    const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
+
+    if (foundstop) {
+      return foundstop.name;
+    } else {
+      console.error("no such stop");
+      res.status(400).json({ Err: "No such stop" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   routeToId,
   stopToId,
   busIdToBus,
   routeIdToroute,
   stopIdToStop,
+  stopIdToStopName,
 };
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Pages/admin_components/apis.dart';
 import './constants.dart';
 
 class CustomButton extends StatelessWidget {
@@ -70,7 +71,6 @@ class ScreenTitle extends StatelessWidget {
   const ScreenTitle({super.key, required this.title});
   final String title;
 
-
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -83,11 +83,9 @@ class ScreenTitle extends StatelessWidget {
   }
 }
 
-
 class CustomTextField extends StatelessWidget {
   const CustomTextField({super.key, required this.textField});
   final TextField textField;
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +114,6 @@ class CustomTextField extends StatelessWidget {
   }
 }
 
-
 class CustomBottomScreen extends StatelessWidget {
   const CustomBottomScreen({
     super.key,
@@ -129,7 +126,6 @@ class CustomBottomScreen extends StatelessWidget {
   final String question;
   final String heroTag;
   final Function buttonPressed;
-
 
   @override
   Widget build(BuildContext context) {
@@ -166,163 +162,81 @@ class CustomBottomScreen extends StatelessWidget {
   }
 }
 
-
 class SearchBarApp extends StatefulWidget {
-  const SearchBarApp({super.key, required this.controller});
-
+  const SearchBarApp(
+      {super.key, required this.controller, required this.hintText});
 
   final SearchController controller;
-
+  final String hintText;
 
   @override
   State<SearchBarApp> createState() => _SearchBarAppState();
 }
 
-
 class _SearchBarAppState extends State<SearchBarApp> {
   bool isDark = false;
-  List<String> suggestions = <String>[
-    "Lagankhel",
-    "Kumaripati",
-    "Jawalakhel",
-    "Pulchowk",
-    "Harihar Bhawan",
-    "Kupondole",
-    "Tripureshwor",
-    "RNAC",
-    "Jamal",
-    "Lainchaur",
-    "Lazimpat",
-    "Panipokhari",
-    "Rastrapati Bhawan",
-    "Teaching Hospital",
-    "Narayan Gopal Chowk",
-    "Basundhara",
-    "Samakhusi",
-    "Gongabu",
-    "New Bus Park",
-    "Godawari",
-    "Taukhel",
-    "Hadegau",
-    "Badegau",
-    "Thaiba",
-    "Harisiddhi",
-    "Hattiban",
-    "Khumaltar",
-    "Satdobato",
-    "Ratnapark",
-    "Thankot",
-    "Tribhuvan Park",
-    "Checkpost",
-    "Satungal",
-    "Naikap",
-    "Dhunge Adda",
-    "Kalanki",
-    "Rabi Bhawan",
-    "Soaltee Mod",
-    "Kalimati",
-    "Teku",
-    "Singh Durbar",
-    "Maitighar",
-    "Babar Mahal",
-    "Bijuli Bazar",
-    "New Baneshwor",
-    "Shantinagar",
-    "Tinkune",
-    "Sinamangal",
-    "Airport",
-    "Bafal",
-    "Sitapaila",
-    "Swayambhu",
-    "Banasthali",
-    "Balaju",
-    "Gangalal Hospital",
-    "Neuro Hospital",
-    "Golfutar",
-    "Telecom Chowk",
-    "Hattigauda",
-    "Chapli",
-    "Deuba Chowk",
-    "Buddhanilkantha",
-    "Lamatar",
-    "Dhungin",
-    "Lubhu",
-    "Sanagau",
-    "KamalpokhariL",
-    "Krishna Mandir",
-    "KIST Hospital",
-    "Gwarko",
-    "BNB Hospital",
-    "Patan dhoka",
-    "Thapathali",
-    "Bhadrakali",
-    "Kamladi",
-    "KamalpokhariK",
-    "Gyaneshwor",
-    "Ratopul",
-    "Gaushala",
-    "Jay Bageshwori",
-    "Mitra Park",
-    "Chabahil",
-    "Chuchepati",
-    "Tusal",
-    "Boudha",
-    "Jorpati",
-    "Narayantar",
-    "Dakshin Dhoka",
-    "Lele",
-    "Tika Bhairav",
-    "Takhal",
-    "Pyan Gaun",
-    "Thecho",
-    "Sunakothi",
-    "Dholahiti",
-    "Chapagaun Dobato"
-  ];
+  List<String> suggestions = [];
+  bool isDataLoaded = false;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchStops();
+  }
+
+  void fetchStops() async {
+    if (!isDataLoaded) {
+      try {
+        final stopsData = await StopApi.getStops();
+        setState(() {
+          suggestions = stopsData['stopsName']!;
+          isDataLoaded = true;
+        });
+      } catch (e) {
+        print('Error fetching routes: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SearchAnchor(
-          builder: (BuildContext context, SearchController controller) {
-            return SearchBar(
-              controller: controller,
-              padding: const MaterialStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.symmetric(horizontal: 16.0)),
+      padding: const EdgeInsets.all(8.0),
+      child: SearchAnchor(
+        builder: (BuildContext context, SearchController controller) {
+          return SearchBar(
+            controller: controller,
+            hintText: widget.hintText,
+            padding: const MaterialStatePropertyAll<EdgeInsets>(
+                EdgeInsets.symmetric(horizontal: 16.0)),
+            onTap: () {
+              controller.openView();
+            },
+            onChanged: (String newText) {
+              controller.text = newText;
+              controller.openView();
+            },
+            leading: const Icon(Icons.search),
+          );
+        },
+        suggestionsBuilder: (BuildContext context, SearchController controller) {
+          final filteredSuggestions = suggestions
+              .where((suggestion) =>
+                  suggestion.toLowerCase().contains(controller.text.toLowerCase()))
+              .toList();
+
+          return List<Widget>.generate(filteredSuggestions.length, (int index) {
+            final String suggestion = filteredSuggestions[index];
+            return ListTile(
+              title: Text(suggestion),
               onTap: () {
-                controller.openView();
+                widget.controller.text = suggestion;
+                controller.closeView(suggestion);
               },
-              onChanged: (String newText) {
-                controller.text = newText;
-
-
-                controller.openView();
-              },
-              leading: const Icon(Icons.search),
             );
-          },
-          suggestionsBuilder:
-              (BuildContext context, SearchController controller) {
-            return List<Widget>.generate(suggestions.length, (int index) {
-              final String suggestion = suggestions[index];
-              return ListTile(
-                title: Text(suggestion),
-                onTap: () {
-                  widget.controller.text = suggestion;
-                  controller.closeView(suggestion);
-                },
-              );
-            });
-          },
-        ));
+          });
+        },
+      ),
+    );
   }
 }
-
-
-
-
-
-
-
