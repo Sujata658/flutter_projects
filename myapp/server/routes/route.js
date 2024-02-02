@@ -1,21 +1,22 @@
 const Route = require("../models/routeModels");
 const express = require("express");
 const router = express.Router();
-const {stopIdToStopName} = require("../routes/helper");
+const { stopIdToStopName } = require("../routes/helper");
 
 router.post("/addroute", async (req, res) => {
   try {
-    const { name, starting, ending, stops } = req.body;
+    const { id, name, start, end, stops_list } = req.body;
 
-    if (!name || !starting || !ending || !stops) {
+    if (!id || !name || !start || !end || !stops_list) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     const newroute = new Route({
+      id,
       name,
-      starting,
-      ending,
-      stops,
+      start,
+      end,
+      stops_list,
     });
 
     await newroute.save();
@@ -53,7 +54,6 @@ router.get("/routes/:id", async (req, res) => {
     const routeId = req.params.id;
     console.log(routeId);
     const route = await Route.findOne({ id: routeId });
-
 
     if (!route) {
       return res.status(404).json({ error: "Route not found" });
