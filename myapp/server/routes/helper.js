@@ -74,11 +74,25 @@ const routeIdToroute = async (routeId) => {
 const stopIdToStop = async (stopId) => {
   try {
     console.log("routeid", stopId);
-    const foundstop = await stop.findOne({ id: stopId }).select({ _id: 0 });
+    const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
 
     if (foundstop) {
       console.log("found stop's  from id ", foundstop);
       return foundstop;
+    } else {
+      console.error("no such stop");
+      res.status(400).json({ Err: "No such stop" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const stopIdToStopName = async (stopId) => {
+  try {
+    const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
+
+    if (foundstop) {
+      return foundstop.name;
     } else {
       console.error("no such stop");
       res.status(400).json({ Err: "No such stop" });
@@ -93,5 +107,5 @@ module.exports = {
   busIdToBus,
   routeIdToroute,
   stopIdToStop,
+  stopIdToStopName,
 };
-
