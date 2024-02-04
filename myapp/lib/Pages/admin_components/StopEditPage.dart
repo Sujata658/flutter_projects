@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin_components/apis.dart';
 
@@ -77,11 +75,10 @@ class _StopAddState extends State<StopAdd> {
   TextEditingController LongController = TextEditingController();
   TextEditingController NameController = TextEditingController();
 
-  handleAddStop(String lat, String lng, String name)async{
-    try{
-      await StopApi.addStop(lat, lng, name) ;
-
-    }catch(e){
+  handleAddStop(String lat, String lng, String name) async {
+    try {
+      await StopApi.addStop(lat, lng, name, context);
+    } catch (e) {
       print('Error adding stop');
     }
   }
@@ -102,10 +99,12 @@ class _StopAddState extends State<StopAdd> {
             ),
             const SizedBox(height: 16.0),
             TextFormField(
+              controller: LongController,
               decoration: const InputDecoration(labelText: 'Longitude'),
             ),
             const SizedBox(height: 16.0),
             TextFormField(
+              controller: NameController,
               decoration: const InputDecoration(labelText: 'Name'),
             ),
             const SizedBox(height: 20.0),

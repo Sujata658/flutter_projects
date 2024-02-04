@@ -13,8 +13,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final SearchController startLocationController = SearchController();
-  final SearchController destinationLocationController = SearchController();
+  final MySearchController startLocationController = MySearchController();
+  final MySearchController destinationLocationController = MySearchController();
   bool isLoading = false;
   bool hasSearched = false;
   Map<String, dynamic> gdata = {};
@@ -153,9 +153,9 @@ class _SearchPageState extends State<SearchPage> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                final String startLocation = startLocationController.text;
+                final String startLocation = startLocationController.id;
                 final String destinationLocation =
-                    destinationLocationController.text;
+                    destinationLocationController.id;
                 handleSearch(startLocation, destinationLocation);
               },
               style: ElevatedButton.styleFrom(backgroundColor: ktextcolor),

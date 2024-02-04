@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin_components/apis.dart';
 import './constants.dart';
 
+class MySearchController extends SearchController {
+  String id = "";
+
+  void setText(String newText) {
+    text = newText;
+    id = "";
+    notifyListeners();
+  }
+}
+
 class CustomButton extends StatelessWidget {
   const CustomButton(
       {super.key,
@@ -166,7 +176,7 @@ class SearchBarApp extends StatefulWidget {
   const SearchBarApp(
       {super.key, required this.controller, required this.hintText});
 
-  final SearchController controller;
+  final MySearchController controller;
   final String hintText;
 
   @override
@@ -175,6 +185,7 @@ class SearchBarApp extends StatefulWidget {
 
 class _SearchBarAppState extends State<SearchBarApp> {
   bool isDark = false;
+  List<Map<String, dynamic>> stops = [];
   List<String> suggestions = [];
   bool isDataLoaded = false;
 
@@ -187,13 +198,15 @@ class _SearchBarAppState extends State<SearchBarApp> {
   void fetchStops() async {
     if (!isDataLoaded) {
       try {
-        final stopsData = await StopApi.getStops();
+        final fetchedStops = await StopApi.getStops();
+
         setState(() {
-          suggestions = stopsData['stopsName']!;
+          stops = fetchedStops;
+          suggestions = stops.map((stop) => stop['name'].toString()).toList();
           isDataLoaded = true;
         });
       } catch (e) {
-        print('Error fetching routes: $e');
+        print('Error fetching stops: $e');
       }
     }
   }
@@ -219,19 +232,32 @@ class _SearchBarAppState extends State<SearchBarApp> {
             leading: const Icon(Icons.search),
           );
         },
-        suggestionsBuilder: (BuildContext context, SearchController controller) {
+        suggestionsBuilder:
+            (BuildContext context, SearchController controller) {
           final filteredSuggestions = suggestions
-              .where((suggestion) =>
-                  suggestion.toLowerCase().contains(controller.text.toLowerCase()))
+              .where((suggestion) => suggestion
+                  .toLowerCase()
+                  .contains(controller.text.toLowerCase()))
               .toList();
 
           return List<Widget>.generate(filteredSuggestions.length, (int index) {
             final String suggestion = filteredSuggestions[index];
+
+            final Map<String, dynamic> selectedStop = stops.firstWhere(
+                (stop) => stop['name'].toString() == suggestion,
+                orElse: () => {});
+
             return ListTile(
               title: Text(suggestion),
               onTap: () {
-                widget.controller.text = suggestion;
-                controller.closeView(suggestion);
+                
+                if (selectedStop.isNotEmpty) {
+                  widget.controller.setText(suggestion);
+                  
+                  var selectedStopId = selectedStop['id'].toString();
+                  widget.controller.id = selectedStopId;
+                  controller.closeView(suggestion);
+                }
               },
             );
           });
