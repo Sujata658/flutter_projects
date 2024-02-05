@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin_components/apis.dart';
 import 'package:myapp/Pages/components/components.dart';
-import 'package:myapp/models/stopmodel.dart';
 
 class RouteEditPage extends StatefulWidget {
   final String routesId;
   final String routesName;
 
-  const RouteEditPage({super.key, required this.routesId, required this.routesName});
+  const RouteEditPage(
+      {super.key, required this.routesId, required this.routesName});
 
   @override
   State<RouteEditPage> createState() => _RouteEditPageState();
@@ -17,7 +17,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController startingController = TextEditingController();
   TextEditingController endingController = TextEditingController();
-  List<TextEditingController> stopControllers = [];
+  List<MySearchController> stopControllers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -45,36 +45,28 @@ class _RouteEditPageState extends State<RouteEditPage> {
             ),
             const SizedBox(height: 16.0),
             const Text('Stops:'),
-            ...stopControllers.map((controller) => TextFormField(
-                  controller: controller,
-                  decoration: const InputDecoration(labelText: 'Stop ID'),
-                )),
+            ...stopControllers.map((controller) =>
+                SearchBarApp(controller: controller, hintText: "Stop Name")),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  stopControllers.add(TextEditingController());
+                  stopControllers.add(MySearchController());
                 });
               },
               child: const Text('Add Stop'),
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                
-              },
+              onPressed: () {},
               child: const Text('Save'),
-              
             ),
             const SizedBox(height: 8.0),
             ElevatedButton(
-              onPressed: () {
-                
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Delete'),
             ),
-            
           ],
         ),
       ),
@@ -83,17 +75,20 @@ class _RouteEditPageState extends State<RouteEditPage> {
 }
 
 class RouteAdd extends StatefulWidget {
-  const RouteAdd({super.key});
+  final VoidCallback onRouteAdded;
+
+  RouteAdd({super.key, required this.onRouteAdded});
 
   @override
   State<RouteAdd> createState() => _RouteAddState();
 }
 
 class _RouteAddState extends State<RouteAdd> {
+  TextEditingController idController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  SearchController startingController = SearchController();
-  SearchController endingController = SearchController();
-  List<TextEditingController> stopControllers = [];
+  MySearchController startingController = MySearchController();
+  MySearchController endingController = MySearchController();
+  List<MySearchController> stopControllers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +100,10 @@ class _RouteAddState extends State<RouteAdd> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            TextFormField(
+              controller: idController,
+              decoration: const InputDecoration(labelText: 'Id'),
+            ),
             TextFormField(
               controller: nameController,
               decoration: const InputDecoration(labelText: 'Name'),
@@ -121,15 +120,16 @@ class _RouteAddState extends State<RouteAdd> {
             ),
             const SizedBox(height: 16.0),
             const Text('Stops:'),
-            ...stopControllers.map((controller) => TextFormField(
+            ...stopControllers.map((controller) => SearchBarApp(
                   controller: controller,
-                  decoration: const InputDecoration(labelText: 'Stop ID'),
+                  hintText: 'Stop ID',
                 )),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  stopControllers.add(TextEditingController());
+                  // stopControllers.add(TextEditingController());
+                  stopControllers.add(MySearchController());
                 });
               },
               child: const Text('Add Stop'),
@@ -140,7 +140,9 @@ class _RouteAddState extends State<RouteAdd> {
                 addRoute();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Save',),
+              child: const Text(
+                'Save',
+              ),
             ),
             const SizedBox(height: 8.0),
           ],
@@ -150,13 +152,24 @@ class _RouteAddState extends State<RouteAdd> {
   }
 
   void addRoute() async {
+    final String id = idController.text;
     final String routesName = nameController.text;
-    final String starting = startingController.text;
-    final String ending = endingController.text;
-    final List<String> stopIds = stopControllers.map((controller) => controller.text).toList();
+    final String starting = startingController.id;
+    ;
+    final String ending = endingController.id;
+    final List<String> stopIds =
+        stopControllers.map((controller) => controller.id).toList();
+
+    print(stopIds);
 
     try {
-      await RouteApi.addRoute( routesName, starting, ending, stopIds);
+      await RouteApi.addRoute(id, routesName, starting, ending, stopIds);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Route added'),
+        ),
+      );
+      widget.onRouteAdded();
       Navigator.pop(context);
     } catch (e) {
       print('Error adding route: $e');

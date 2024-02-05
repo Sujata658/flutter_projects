@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VehicleEditPage extends StatefulWidget {
-  final String vehicleId;
-  final String vehicleName;
+  final Map<String, dynamic> vehicle;
 
-  const VehicleEditPage({required this.vehicleId, required this.vehicleName});
+  const VehicleEditPage({required this.vehicle});
 
   @override
   State<VehicleEditPage> createState() => _VehicleEditPageState();
@@ -17,28 +16,29 @@ class _VehicleEditPageState extends State<VehicleEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Vehicle')),
+      appBar: AppBar(title: Text('Editing ${widget.vehicle['name']}',)),
       body: Container(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Editing ${widget.vehicleName}',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            
+            
           ],
         ),
       ),
+
     );
   }
 }
 
 class VehicleAdd extends StatefulWidget {
-  const VehicleAdd({super.key});
+    final VoidCallback onVehicleAdded;
+  const VehicleAdd({Key? key, required this.onVehicleAdded});
 
   @override
   State<VehicleAdd> createState() => _VehicleAddState();
+  
 }
 
 class _VehicleAddState extends State<VehicleAdd> {
@@ -74,18 +74,15 @@ class _VehicleAddState extends State<VehicleAdd> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(jsonDecode(response.body)['error'])),
           );
-        } else if (response.statusCode == 201) {
-          print('vehicle added successfully');
-          // print(response.body);
+        } else if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonDecode(response.body)["message"])),
+            SnackBar(content: Text('Vehicle added successfully')),
           );
-
-          // Navigator.pop(context);
-        } else {
-          print('here');
+          widget.onVehicleAdded();
+          Navigator.pop(context);
+        } else { 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response.body)),
+            SnackBar(content: Text('An error occurred: ${response.body}')),
           );
         }
       } else {

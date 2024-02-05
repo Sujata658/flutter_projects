@@ -26,7 +26,6 @@ class _StopViewState extends State<StopView> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      // print(responseData);
       setState(() {
         stopNames = List<String>.from(responseData['stopsName']);
       });
@@ -41,11 +40,10 @@ class _StopViewState extends State<StopView> {
       appBar: AppBar(title: Text('Stops')),
       body: Container(
         padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListView.builder(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: stopNames.length,
                 itemBuilder: (context, index) {
@@ -66,24 +64,24 @@ class _StopViewState extends State<StopView> {
                   );
                 },
               ),
-              Center(
-                child: ElevatedButton(onPressed: () { 
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
                   Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                StopAdd(),
-                          ),
-                        );
-
-                 },
-                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red
-                 ),
-                child: Text('Add a Stop'),)
-              )
-            ],
-          ),
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StopAdd(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: Text('Add a Stop'),
+              ),
+            ),
+          ],
         ),
       ),
     );

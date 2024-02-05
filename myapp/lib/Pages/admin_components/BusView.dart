@@ -12,8 +12,8 @@ class BusView extends StatefulWidget {
 }
 
 class _BusViewState extends State<BusView> {
-  List<String> vehicleNames = [];
-  List<String> vehicleIds = [];
+  List<Map<String, dynamic>> vehicles = [];
+  bool isDataLoaded = false;
 
   @override
   void initState() {
@@ -22,70 +22,84 @@ class _BusViewState extends State<BusView> {
   }
 
   void fetchRoutes() async {
-    final response = await http.get(Uri.parse('http://localhost:5000/vehicleslist'));
+    try {
+      final response =
+          await http.get(Uri.parse('http://localhost:5000/vehicles'));
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      setState(() {
-        vehicleNames = List<String>.from(responseData['vehicleNames']);
-        vehicleIds = List<String>.from(responseData['vehicleIds']);
-      });
-    } else {
-      throw Exception('Failed to load routes');
+      if (mounted) {
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            vehicles = List<Map<String, dynamic>>.from(responseData['vehicles']);
+            isDataLoaded = true;
+          });
+        } else {
+          throw Exception('Failed to load routes');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
-  void navigateToVehicleEditPage(String vehicleId, String vehicleName) {
+  void navigateToVehicleEditPage(Map<String, dynamic> vehicle) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VehicleEditPage(vehicleId: vehicleId, vehicleName: vehicleName),
+        builder: (context) => VehicleEditPage(vehicle: vehicle),
       ),
     );
+    fetchRoutes();
   }
-
+void onVehicleAdded() {
+    fetchRoutes();
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Buses')),
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Buses', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: vehicleNames.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(vehicleNames[index]),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      navigateToVehicleEditPage(vehicleIds[index], vehicleNames[index]);
+    return isDataLoaded
+        ? Scaffold(
+            appBar: AppBar(title: Text('Vehicles')),
+            body: Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: vehicles.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(vehicles[index]['name'] + ' - '  + vehicles[index]['route']),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            navigateToVehicleEditPage(vehicles[index]);
+                          },
+                          child: Text('Edit'),
+                        ),
+                      );
                     },
-                    child: Text('Edit'),
                   ),
-                );
-              },
-            ),
-            Center(
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => VehicleAdd()));
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text(
-                    "Add a vehicle",
+                  Center(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => VehicleAdd(onVehicleAdded: onVehicleAdded,)));
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red),
+                        child: const Text(
+                          "Add a vehicle",
+                        )),
                   )
-                  ),
-            )
-          ],
-        ),
-      ),
-    );
+                ],
+              ),
+            ),
+          )
+        : Center(
+            child: CircularProgressIndicator(),
+          );
   }
 }
-

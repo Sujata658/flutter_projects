@@ -21,6 +21,8 @@ router.post("/addroute", async (req, res) => {
 
     await newroute.save();
 
+    console.log("route added", newroute);
+
     res.json({ success: true, message: newroute });
   } catch (error) {
     console.error("Error creating route:", error);

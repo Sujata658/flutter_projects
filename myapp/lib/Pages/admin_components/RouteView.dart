@@ -23,9 +23,9 @@ class _RouteViewState extends State<RouteView> {
   void fetchRoutes() async {
     if (!isDataLoaded) {
       try {
-        final routesData= await RouteApi.getRoutes();
+        final routesData = await RouteApi.getRoutes();
         // print('Routes Data: $routesData');
-        print(routesData);
+        // print(routesData);
         setState(() {
           routesNames = routesData['routeNames']!;
           routesIds = routesData['routeIds']!;
@@ -83,7 +83,11 @@ class _RouteViewState extends State<RouteView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const RouteAdd()));
+                                    builder: (context) => RouteAdd(
+                                          onRouteAdded: () {
+                                            fetchRoutes();
+                                          },
+                                        )));
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red),
