@@ -12,10 +12,8 @@ class BusView extends StatefulWidget {
 }
 
 class _BusViewState extends State<BusView> {
-  List<String> vehicleNames = [];
+  List<Map<String, dynamic>> vehicles = [];
   bool isDataLoaded = false;
-
-  // List<String> vehicleIds = [];
 
   @override
   void initState() {
@@ -24,39 +22,43 @@ class _BusViewState extends State<BusView> {
   }
 
   void fetchRoutes() async {
-    final response =
-        await http.get(Uri.parse('http://localhost:5000/vehicleslist'));
+    try {
+      final response =
+          await http.get(Uri.parse('http://localhost:5000/vehicles'));
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      setState(() {
-        vehicleNames = List<String>.from(responseData['vehicleNames']);
-        isDataLoaded = true;
-        // vehicleIds = List<String>.from(responseData['vehicleIds']);
-      });
-    } else {
-      throw Exception('Failed to load routes');
+      if (mounted) {
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            vehicles = List<Map<String, dynamic>>.from(responseData['vehicles']);
+            isDataLoaded = true;
+          });
+        } else {
+          throw Exception('Failed to load routes');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
-  void navigateToVehicleEditPage(String vehicleName) {
-    Navigator.pushReplacement(
+  void navigateToVehicleEditPage(Map<String, dynamic> vehicle) {
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VehicleEditPage(vehicleName: vehicleName),
+        builder: (context) => VehicleEditPage(vehicle: vehicle),
       ),
     );
     fetchRoutes();
   }
 void onVehicleAdded() {
-    // Refresh the vehicle list after adding a new vehicle
     fetchRoutes();
   }
   @override
   Widget build(BuildContext context) {
     return isDataLoaded
         ? Scaffold(
-            appBar: AppBar(title: Text('Buses')),
+            appBar: AppBar(title: Text('Vehicles')),
             body: Container(
               padding: EdgeInsets.all(16.0),
               child: Column(
@@ -65,13 +67,13 @@ void onVehicleAdded() {
                   SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: vehicleNames.length,
+                    itemCount: vehicles.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(vehicleNames[index]),
+                        title: Text(vehicles[index]['name'] + ' - '  + vehicles[index]['route']),
                         trailing: ElevatedButton(
                           onPressed: () {
-                            navigateToVehicleEditPage(vehicleNames[index]);
+                            navigateToVehicleEditPage(vehicles[index]);
                           },
                           child: Text('Edit'),
                         ),

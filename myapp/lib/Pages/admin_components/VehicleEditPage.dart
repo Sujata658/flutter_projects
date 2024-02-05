@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VehicleEditPage extends StatefulWidget {
-  final String vehicleName;
+  final Map<String, dynamic> vehicle;
 
-  const VehicleEditPage({required this.vehicleName});
+  const VehicleEditPage({required this.vehicle});
 
   @override
   State<VehicleEditPage> createState() => _VehicleEditPageState();
@@ -16,19 +16,18 @@ class _VehicleEditPageState extends State<VehicleEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Vehicle')),
+      appBar: AppBar(title: Text('Editing ${widget.vehicle['name']}',)),
       body: Container(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Editing ${widget.vehicleName}',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            
+            
           ],
         ),
       ),
+
     );
   }
 }

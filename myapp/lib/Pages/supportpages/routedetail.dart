@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:myapp/Pages/components/constants.dart';
+import 'package:myapp/Pages/supportpages/mapRoute.dart';
 
 class RouteDetail extends StatefulWidget {
   final String routeID;
@@ -22,11 +23,11 @@ class _RouteDetailState extends State<RouteDetail> {
     'stops_list': [],
   };
 
-// var coordinates = {
-//     'stops': <LatLng>[],
-//     'start': const LatLng(0, 0),
-//     'end': const LatLng(0, 0),
-//   };
+var coordinates = {
+    'stops': <LatLng>[],
+    'start': const LatLng(0, 0),
+    'end': const LatLng(0, 0),
+  };
   bool isLoading = true;
 
   @override
@@ -40,6 +41,8 @@ class _RouteDetailState extends State<RouteDetail> {
       final response = await http.get(
         Uri.parse('http://localhost:5000/routes/${widget.routeID}'),
       );
+
+      print(response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -159,20 +162,19 @@ class _RouteDetailState extends State<RouteDetail> {
                           ),
                         ),
                         const SizedBox(height: 16.0),
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => MapRoute(
-                        //             coordinates: coordinates,
-                        //             routedetails: routeData),
-                        //       ),
-                        //     );
-                        //     // print(coordinates);
-                        //   },
-                        //   child: const Text('View in Map'),
-                        // ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MapRoute(
+                                    coordinates: coordinates,
+                                    routedetails: routeData),
+                              ),
+                            );
+                          },
+                          child: const Text('View in Map'),
+                        ),
                       ],
                     ),
             ),
