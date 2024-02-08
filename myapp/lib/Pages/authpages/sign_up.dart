@@ -191,7 +191,27 @@ class _SignUpPageState extends State<SignUpPage> {
                                     'Login',
                                     style: TextStyle(
                                         decoration: TextDecoration.underline),
-                                  ))
+                                  )),
+
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Are you a driver?'),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/driversignup');
+                                  },
+                                  child: const Text(
+                                    'Login As a Driver',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline),
+                                  )),
+                                  
                             ],
                           )
                         ],

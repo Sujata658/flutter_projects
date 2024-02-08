@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin.dart';
+import 'package:myapp/Pages/authpages/driverlogin.dart';
+import 'package:myapp/Pages/authpages/driversignup.dart';
+import 'package:myapp/Pages/bustracking/busstream.dart';
+import 'package:myapp/Pages/bustracking/driverbt.dart';
 import 'package:myapp/Pages/homepages/home.dart';
 import 'package:myapp/Pages/authpages/sign_up.dart';
 import 'package:myapp/Pages/authpages/login.dart';
@@ -25,11 +29,13 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       // home: MapPage(),
-      initialRoute: '/admin',
+      initialRoute:'driverview',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignUpPage(),
         '/login': (context) => const LoginPage(),
+        'driversignup': (context)=> const DriverSignUp(),
+        '/driverlogin': (context)=> const DriverLogin(),
 
         //homescreen
         '/home': (context) => const Home(),
@@ -39,8 +45,8 @@ class MyApp extends StatelessWidget {
         //admin components
         '/admin': (context) => AdminDashboard(),
 
-        //support pages
-
+        //bustracking
+        'driverview': (context) => MapWidget(),
       },
     );
   }
