@@ -58,36 +58,36 @@ class _MapRouteState extends State<MapRoute> {
     }
 
     stops = (widget.coordinates['stops'] as List<LatLng>?) ?? [];
-    // findRoutes() async {
-    //   var points = [];
-    //   var somerandom = [];
+    findRoutes() async {
+      var points = [];
+      var somerandom = [];
 
-    //   (widget.coordinates['stops'] as List<LatLng>?)?.forEach((stop) {
-    //     points.add('${stop.latitude},${stop.longitude}');
-    //   });
+      (widget.coordinates['stops'] as List<LatLng>?)?.forEach((stop) {
+        points.add('${stop.latitude},${stop.longitude}');
+      });
 
-    //   int third = points.length ~/ 3;
-    //   for (int i = 0; i < third; i++) {
-    //     somerandom.add(points[i]);
-    //   }
+      int third = points.length ~/ 3;
+      for (int i = 0; i < third; i++) {
+        somerandom.add(points[i]);
+      }
 
-    //   print(points);
+      print(points);
 
-    //   String baatoAccessToken =
-    //       "bpk.Y3F6J1D0KoXZRXyiAh8qCGGD43TSSX7AzuDU9lhpK00g";
+      String baatoAccessToken =
+          "bpk.Y3F6J1D0KoXZRXyiAh8qCGGD43TSSX7AzuDU9lhpK00g";
 
-    //   BaatoRoute baatoRoute = BaatoRoute.initialize(
-    //       accessToken: baatoAccessToken,
-    //       points: points,
-    //       mode: "car",
-    //       alternatives: false,
-    //       instructions: false);
-    //   RouteResponse response = await baatoRoute.getRoutes();
-    //   String encodedPolyline = response.data?[0].encodedPolyline ?? "";
+      BaatoRoute baatoRoute = BaatoRoute.initialize(
+          accessToken: baatoAccessToken,
+          points: points,
+          mode: "car",
+          alternatives: false,
+          instructions: false);
+      RouteResponse response = await baatoRoute.getRoutes();
+      String encodedPolyline = response.data?[0].encodedPolyline ?? "";
 
-    //   decodedRoutePoints = decodePolyline(encodedPolyline);
-    //   setState(() {});
-    // }
+      decodedRoutePoints = decodePolyline(encodedPolyline);
+      setState(() {});
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -139,17 +139,17 @@ class _MapRouteState extends State<MapRoute> {
                     ],
                   ),
                 ),
-                // ButtonBar(
-                //   alignment: MainAxisAlignment.center,
-                //   children: [
-                //     ElevatedButton(
-                //       onPressed: () {
-                //         findRoutes();
-                //       },
-                //       child: const Text('Find Routes'),
-                //     ),
-                //   ],
-                // ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        findRoutes();
+                      },
+                      child: const Text('Find Routes'),
+                    ),
+                  ],
+                ),
               ],
             ),
     );
