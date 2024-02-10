@@ -22,6 +22,25 @@ const stopToId = async (stopname) => {
 };
 
 console.log();
+const stopToCoordinates = async (stop_id) => {
+  try {
+    const foundStop = await Stop.findOne({ id: stop_id }).select({ _id: 0 });
+    console.log("found stop for coordinates line 28", foundStop);
+
+    if (foundStop) {
+      console.log("found lat long", foundStop.lat, foundStop.long);
+      return { lat: foundStop.lat, long: foundStop.long };
+    } else {
+      console.error("no such stop found in line 34");
+      // Handle the case when stop is not found
+      return { lat: 0, long: 0 }; // or throw an error, depending on your requirement
+    }
+  } catch (err) {
+    console.log(err);
+    // Handle other errors, e.g., return a default value or throw an error
+    return { lat: 0, long: 0 };
+  }
+};
 
 const routeToId = async (routename) => {
   try {
@@ -32,7 +51,7 @@ const routeToId = async (routename) => {
       return foundroute.id;
     } else {
       console.error("no such route");
-      res.status(400).json({ Err: "No such route" });
+      // res.status(400).json({ Err: "No such route" });
     }
   } catch (err) {
     console.log(err);
@@ -65,7 +84,7 @@ const routeIdToroute = async (routeId) => {
       return foundroute;
     } else {
       console.error("no such route");
-      res.status(400).json({ Err: "No such route" });
+      // res.status(400).json({ Err: "No such route" });
     }
   } catch (err) {
     console.log(err);
@@ -81,12 +100,25 @@ const stopIdToStop = async (stopId) => {
       return foundstop;
     } else {
       console.error("no such stop");
-      res.status(400).json({ Err: "No such stop" });
     }
   } catch (err) {
     console.log(err);
   }
 };
+// const stopIdToStopName = async (stopId) => {
+//   try {
+//     const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
+
+//     if (foundstop) {
+//       return foundstop.name;
+//     } else {
+//       console.error("no such stop line 111");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
 const stopIdToStopName = async (stopId) => {
   try {
     const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
@@ -95,7 +127,7 @@ const stopIdToStopName = async (stopId) => {
       return foundstop.name;
     } else {
       console.error("no such stop");
-      res.status(400).json({ Err: "No such stop" });
+      // res.status(400).json({ Err: "No such stop" });
     }
   } catch (err) {
     console.log(err);
@@ -109,5 +141,5 @@ module.exports = {
   routeIdToroute,
   stopIdToStop,
   stopIdToStopName,
+  stopToCoordinates,
 };
-

@@ -1,7 +1,7 @@
 const Route = require("../models/routeModels");
 const express = require("express");
 const router = express.Router();
-const { stopIdToStopName } = require("../routes/helper");
+const { stopIdToStopName, stopToCoordinates } = require("../routes/helper");
 
 router.post("/addroute", async (req, res) => {
   try {
@@ -61,12 +61,8 @@ router.get("/routes/:id", async (req, res) => {
       return res.status(404).json({ error: "Route not found" });
     }
     const stopsDataList = route.stops_list;
-    console.log("stopss listtttt", route.start);
+    console.log("stopss data listtttt", stopsDataList);
 
-    // if (!Array.isArray(stopsDataList)) {
-    //   console.error("Invalid stops_list data:", stops_list);
-    //   return res.status(500).json({ error: "Invalid stops_list data" });
-    // }
     const routeName = route.name;
     console.log("route name", routeName);
 
@@ -75,11 +71,22 @@ router.get("/routes/:id", async (req, res) => {
         return await stopIdToStopName(stop);
       })
     );
+
+    const lagankhel = await stopIdToStopName("1");
+    console.log("lagankhel", lagankhel);
+
+    const coordinates = await Promise.all(
+      stopsDataList.map(async (stop) => {
+        const { lat, long } = await stopToCoordinates(stop);
+        return { lat, long };
+      })
+    );
+
     const startStop = await stopIdToStopName(route.start);
     const endStop = await stopIdToStopName(route.end);
 
     // console.log(route);
-    res.json({ routeName, stopsData, startStop, endStop });
+    res.json({ routeName, stopsData, startStop, endStop, coordinates });
   } catch (error) {
     console.error("Error fetching route by ID:", error);
     res.status(500).json({ error: "Failed to fetch route by ID" });
