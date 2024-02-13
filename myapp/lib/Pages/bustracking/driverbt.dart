@@ -11,8 +11,8 @@ class Driver {
       _locationStreamController.stream;
 
   void startSendingLocation() {
-    _locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      print(Geolocator.getCurrentPosition());
+    _locationTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // print(Geolocator.getCurrentPosition());
       Geolocator.getCurrentPosition().then((position) {
         double latitude = position.latitude;
         double longitude = position.longitude;
