@@ -175,6 +175,7 @@ router.post("/searchByName", async (req, res) => {
     }
     source = await stopToId(source);
     destination = await stopToId(destination);
+    console.log("source and destination id", source, destination);
 
     const data = await Fare.find({
       starting: source,
