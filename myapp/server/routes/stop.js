@@ -4,13 +4,14 @@ const router = express.Router();
 
 router.post("/addstop", async (req, res) => {
   try {
-    const { lat, long, name } = req.body;
+    const { id, lat, long, name } = req.body;
 
-    if (!lat || !long || !name) {
+    if (!lat || !long || !name || !id) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     const newstop = new Stop({
+      id,
       lat,
       long,
       name,
@@ -49,7 +50,7 @@ router.get("/stops/:id", async (req, res) => {
   try {
     const stopId = req.params.id;
     console.log(stopId);
-    
+
     const stop = await Stop.findOne({ id: stopId });
 
     if (!stop) {
