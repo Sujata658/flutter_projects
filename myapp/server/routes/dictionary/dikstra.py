@@ -998,9 +998,9 @@ graph = nx.Graph()
 
 # Add edges to the graph with 'label' as string
 for route_id, edges in all_edges.items():
-    edges_with_weight = [(edge[0], edge[1], str(route['id']))
+    edges_with_weight = [(edge[0], edge[1], str(route_id))
                          for edge in edges]
-    graph.add_weighted_edges_from(edges_with_weight, label=route_id)
+    graph.add_weighted_edges_from(edges_with_weight, label=str(route_id))
 
 # Visualize the graph
 labels = nx.get_edge_attributes(graph, 'label')
@@ -1023,6 +1023,8 @@ for edge, label in labels.items():
 plt.show()
 
 
+# ...
+
 def dijkstra(graph, start_stop, end_stop):
     # Use NetworkX's implementation of Dijkstra's algorithm
     path = nx.shortest_path(graph, source=start_stop,
@@ -1033,6 +1035,8 @@ def dijkstra(graph, start_stop, end_stop):
                          for i in range(len(path) - 1))
 
     return total_distance, path
+
+# ...
 
 
 # Example usage
