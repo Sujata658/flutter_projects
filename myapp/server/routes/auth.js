@@ -93,7 +93,7 @@ router.post("/search", async (req, res) => {
       ending: destination,
     });
 
-    // console.log(data);
+    console.log(data);
 
     if (data.length === 0) {
       const data2 = await Fare.find({
@@ -105,12 +105,13 @@ router.post("/search", async (req, res) => {
         console.log("No matching routes found");
         return res.status(422).json({ error: "No matching routes found" });
       } else {
+        console.log("printing actual data", data2);
         const responseData = data2.map(async (fare) => {
           const busId = fare.bus;
           const foundBus = await busIdToBus(busId);
           const routeId = foundBus.route;
           const foundRoute = await routeIdToroute(routeId);
-
+          //write code to get stops from the stop ids from foundRoute.stops_list
           return {
             rate: fare.rate,
             bus: foundBus.name,
