@@ -121,10 +121,27 @@ const stopIdToStop = async (stopId) => {
 
 const stopIdToStopName = async (stopId) => {
   try {
+    console.log(stopId);
     const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
-
+    console.log(foundstop);
     if (foundstop) {
       return foundstop.name;
+    } else {
+      console.error("no such stop");
+      // res.status(400).json({ Err: "No such stop" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const stopIdToLatLong = async (stopId) => {
+  try {
+    console.log(stopId);
+    const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
+    console.log(foundstop);
+    if (foundstop) {
+      const coordinates = { lat: foundstop.lat, long: foundstop.long };
+      return coordinates;
     } else {
       console.error("no such stop");
       // res.status(400).json({ Err: "No such stop" });
@@ -141,5 +158,5 @@ module.exports = {
   routeIdToroute,
   stopIdToStop,
   stopIdToStopName,
-  stopToCoordinates,
+  stopIdToLatLong,
 };

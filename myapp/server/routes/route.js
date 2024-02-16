@@ -1,7 +1,7 @@
 const Route = require("../models/routeModels");
 const express = require("express");
 const router = express.Router();
-const { stopIdToStopName, stopToCoordinates } = require("../routes/helper");
+const { stopIdToStopName, stopIdToLatLong } = require("../routes/helper");
 
 router.post("/addroute", async (req, res) => {
   try {
@@ -71,22 +71,17 @@ router.get("/routes/:id", async (req, res) => {
         return await stopIdToStopName(stop);
       })
     );
-
-    const lagankhel = await stopIdToStopName("1");
-    console.log("lagankhel", lagankhel);
-
-    const coordinates = await Promise.all(
+    const latlongData = await Promise.all(
       stopsDataList.map(async (stop) => {
-        const { lat, long } = await stopToCoordinates(stop);
-        return { lat, long };
+        console.log("lat long data", stopIdToLatLong(stop));
+        return await stopIdToLatLong(stop);
       })
     );
-
     const startStop = await stopIdToStopName(route.start);
     const endStop = await stopIdToStopName(route.end);
 
     // console.log(route);
-    res.json({ routeName, stopsData, startStop, endStop, coordinates });
+    res.json({ routeName, stopsData, startStop, endStop, latlongData });
   } catch (error) {
     console.error("Error fetching route by ID:", error);
     res.status(500).json({ error: "Failed to fetch route by ID" });
