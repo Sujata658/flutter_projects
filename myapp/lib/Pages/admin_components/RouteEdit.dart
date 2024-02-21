@@ -164,6 +164,7 @@ class _RouteAddState extends State<RouteAdd> {
 
     try {
       await RouteApi.addRoute(id, routesName, starting, ending, stopIds);
+      widget.onRouteAdded;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Route added'),

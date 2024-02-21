@@ -16,7 +16,7 @@ const colors = [
 ];
 
 const recommend = [
-  {'image': 'assets/images/vehicles/sajha.jpg', 'color': Color(0xFFFFEBF4)},
-  {'image': 'assets/images/vehicles/NY.jpg', 'color': Color(0xFF9BDDE1)},
+  {'image': 'assets/images/vehicles/sajha.jpg', 'color': Color.fromARGB(255, 181, 255, 120), },
+  {'image': 'assets/images/vehicles/NY.jpg', 'color': Color.fromARGB(255, 255, 202, 104)},
   {'image': 'assets/images/splash.png', 'color': Color(0xFF9BDDE1)},
 ];

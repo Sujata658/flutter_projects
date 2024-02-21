@@ -1,8 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:myapp/Pages/admin_components/VehicleEditPage.dart';
+import 'package:myapp/Pages/admin_components/apis.dart';
 
 class BusView extends StatefulWidget {
   const BusView({super.key});
@@ -24,19 +23,15 @@ class _BusViewState extends State<BusView> {
   void fetchRoutes() async {
     try {
       final response =
-          await http.get(Uri.parse('http://localhost:5000/vehicles'));
+          await BusApi.getVehicles();
 
-      if (mounted) {
-        if (response.statusCode == 200) {
-          final responseData = json.decode(response.body);
+      
           setState(() {
-            vehicles = List<Map<String, dynamic>>.from(responseData['vehicles']);
+            vehicles = response;
             isDataLoaded = true;
           });
-        } else {
-          throw Exception('Failed to load routes');
-        }
-      }
+        
+      
     } catch (e) {
       print('Error: $e');
     }

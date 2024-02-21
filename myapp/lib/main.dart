@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       // home: MapPage(),
-      initialRoute: '/admin',
+      initialRoute: '/home',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignUpPage(),

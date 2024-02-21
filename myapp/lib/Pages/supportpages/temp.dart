@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/Pages/components/components.dart';
 import 'package:myapp/Pages/components/constants.dart';
-import 'package:myapp/Pages/supportpages/mapRoute.dart';
 import 'package:myapp/Pages/supportpages/routedetail.dart';
 
 class SearchPage extends StatefulWidget {
@@ -46,9 +45,6 @@ class _SearchPageState extends State<SearchPage> {
       );
       setState(() {
         isLoading = false;
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return MapRoute(routedetails: {}, coordinates: {},);
-        // }));
       });
       if (response.statusCode == 200) {
         setState(() {

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:latlong2/latlong.dart';
+// import 'package:latlong2/latlong.dart';
 import 'package:myapp/Pages/components/constants.dart';
 import 'package:myapp/Pages/supportpages/mapRoute.dart';
 
@@ -21,13 +21,10 @@ class _RouteDetailState extends State<RouteDetail> {
     'start': '',
     'end': '',
     'stops_list': [],
+    'coordinates': []
   };
 
-var coordinates = {
-    'stops': <LatLng>[],
-    'start': const LatLng(0, 0),
-    'end': const LatLng(0, 0),
-  };
+
   bool isLoading = true;
 
   @override
@@ -38,40 +35,50 @@ var coordinates = {
 
   Future<void> fetchRouteAndStopsData() async {
     try {
-      final response = await http.get(
-        Uri.parse('http://localhost:5000/routes/${widget.routeID}'),
-      );
+    final response = await http.get(
+      Uri.parse('http://localhost:5000/routes/${widget.routeID}'),
+    );
 
-      print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      final Map<String, dynamic> routes = data as Map<String, dynamic>;
 
-        final Map<String, dynamic> routes = data as Map<String, dynamic>;
-
-        if (mounted) {
-          setState(() {
-            routeData['name'] = routes['routeName'];
-            routeData['start'] = routes['startStop'];
-            routeData['end'] = routes['endStop'];
-
-            routeData['stops_list'] = routes['stopsData'];
-            isLoading = false;
-          });
-        }
-      } else {
-        print('Error fetching route data: ${response.body}');
-      }
-    } catch (e) {
-      print('Error fetching route data: $e');
-    } finally {
       if (mounted) {
         setState(() {
+          routeData['name'] = routes['routeName'];
+          routeData['start'] = routes['startStop'];
+          routeData['end'] = routes['endStop'];
+          routeData['stops_list'] = List<String>.from(routes['stopsData']);
+
+          // Extract and store coordinates in [(lat, long)] format
+          routeData['coordinates'] = List<Map<String, double>>.from(
+            routes['latlongData'].map((coord) => {
+              'lat': coord['lat'] as double,
+              'long': coord['long'] as double,
+            }),
+          );
+
+          // print(routeData['coordinates']);
+
           isLoading = false;
         });
       }
+    } else {
+      print('Error fetching route data: ${response.body}');
+    }
+  } catch (e) {
+    print('Error fetching route data: $e');
+  } finally {
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
+  }
+
+
 
 
 
@@ -168,7 +175,7 @@ var coordinates = {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MapRoute(
-                                    coordinates: coordinates,
+                                    
                                     routedetails: routeData),
                               ),
                             );

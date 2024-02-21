@@ -111,7 +111,32 @@ class StopApi {
 }
 
 class BusApi {
-  static Future<Map<String, List<String>>> getBus() async {
+
+static Future<List<Map<String, dynamic>>> getVehicles() async {
+  final response = await http.get(Uri.parse('http://localhost:5000/vehicles'));
+
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    final List<dynamic> vehiclesData = responseData['vehicles'];
+
+    List<Map<String, dynamic>> vehiclesList = vehiclesData.map((vehicle) {
+      return {
+        '_id': vehicle['_id'],
+        'bid': vehicle['bid'],
+        'name': vehicle['name'],
+        'type': vehicle['type'],
+        'direction': vehicle['direction'],
+        'route': vehicle['route'],
+      };
+    }).toList();
+
+    return vehiclesList;
+  } else {
+    throw Exception('Failed to load vehicles');
+  }
+}
+
+  static Future<Map<String, List<String>>> getVehiclesList() async {
     final response =
         await http.get(Uri.parse('http://localhost:5000/vehicleslist'));
 

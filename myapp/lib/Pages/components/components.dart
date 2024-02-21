@@ -195,22 +195,30 @@ class _SearchBarAppState extends State<SearchBarApp> {
     fetchStops();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void fetchStops() async {
     if (!isDataLoaded) {
       try {
         final fetchedStops = await StopApi.getStops();
-
-        setState(() {
-          stops = fetchedStops;
-          suggestions = stops.map((stop) => stop['name'].toString()).toList();
-          isDataLoaded = true;
-        });
+        if (mounted) {
+          setState(() {
+            stops = fetchedStops;
+            suggestions = stops.map((stop) => stop['name'].toString()).toList();
+            isDataLoaded = true;
+          });
+        }
       } catch (e) {
-        print('Error fetching stops: $e');
+        
+        if (mounted) {
+          print('Error fetching stops: $e');
+        }
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
