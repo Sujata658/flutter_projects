@@ -177,3 +177,43 @@ class _RouteAddState extends State<RouteAdd> {
     }
   }
 }
+
+class ShowRoute extends StatefulWidget {
+  final String routesId;
+  final String routesName;
+  ShowRoute({super.key, required this.routesId, required this.routesName});
+
+  @override
+  State<ShowRoute> createState() => _ShowRouteState();
+}
+
+class _ShowRouteState extends State<ShowRoute> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.routesName),
+      ),
+      body: FutureBuilder(
+        future: RouteApi.getRoutes(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          final routesData = snapshot.data;
+          return ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text('Test'),
+                subtitle: Text('TestSubtitle'),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}

@@ -10,7 +10,6 @@ class RouteApi {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
-      // Check for null values before casting
       final List<String> routeNames =
           (responseData['routeNames'] as List<dynamic>?)?.cast<String>() ?? [];
       final List<String> routeIds =
@@ -53,6 +52,16 @@ class RouteApi {
       print('Error adding route: $e');
     }
   }
+
+static Future<void> getSingleRoute(String id) async{
+  try{
+    var response = http.get(Uri.parse('http://localhost:5000/routes?$id'));
+    
+  }catch(e){
+    print('Error getting single route: $e');
+  }
+}
+
 }
 
 class StopApi {

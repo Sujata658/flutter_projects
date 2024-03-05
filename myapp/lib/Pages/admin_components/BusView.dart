@@ -64,13 +64,17 @@ void onVehicleAdded() {
                     shrinkWrap: true,
                     itemCount: vehicles.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(vehicles[index]['name'] + ' - '  + vehicles[index]['route']),
-                        trailing: ElevatedButton(
-                          onPressed: () {
-                            navigateToVehicleEditPage(vehicles[index]);
-                          },
-                          child: Text('Edit'),
+                      return InkWell(
+                        onTap: () {
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => VehicleShowPage(vehicle: vehicles[index],)));
+                        },
+                        child: ListTile(
+                          title: Text(vehicles[index]['name'] + ' - '  + vehicles[index]['route']),
+                          
                         ),
                       );
                     },

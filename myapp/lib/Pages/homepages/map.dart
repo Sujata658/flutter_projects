@@ -1,12 +1,7 @@
-import 'dart:convert';
-
-import 'package:baato_api/models/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:baato_api/baato_api.dart';
-import 'package:myapp/Pages/components/constants.dart';
-
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -17,93 +12,59 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   List<LatLng> decodedRoutePoints = [];
+  bool isLoading = true;
+  late Position currentLocation;
+  List<String> routeNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
   
-  get http => null;
+@override
+void dispose() {
+  super.dispose();
+}
+
+
   @override
   Widget build(BuildContext context) {
-    List<LatLng> decodePolyline(String encoded) {
-      List<LatLng> points = <LatLng>[];
-      int index = 0, len = encoded.length;
-      int lat = 0, lng = 0;
-
-
-      while (index < len) {
-        int b, shift = 0, result = 0;
-        do {
-          b = encoded.codeUnitAt(index++) - 63;
-          result |= (b & 0x1f) << shift;
-          shift += 5;
-        } while (b >= 0x20);
-        int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-        lat += dlat;
-
-
-        shift = 0;
-        result = 0;
-        do {
-          b = encoded.codeUnitAt(index++) - 63;
-          result |= (b & 0x1f) << shift;
-          shift += 5;
-        } while (b >= 0x20);
-        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-        lng += dlng;
-
-
-        points.add(LatLng(lat / 1E5, lng / 1E5));
-      }
-      return points;
-    }
-
-
-    findRoutes() async {
-      var points = [];
-
-      try{
-        final response = await http.get(Uri.parse('http://localhost:5000/search'));
-        if(response.statusCode == 200){
-          final data = jsonDecode(response.body);
-          points = data['data'];
-        }
-      } catch(e){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
-      }
-
-
-      points.add("27.717844,85.3248188");
-      points.add("27.6876224,85.33827");
-
-
-      String baatoAccessToken =
-          "bpk.Y3F6J1D0KoXZRXyiAh8qCGGD43TSSX7AzuDU9lhpK00g";
-
-
-      BaatoRoute baatoRoute = BaatoRoute.initialize(
-          accessToken: baatoAccessToken,
-          points: points,
-          mode: "car",
-          alternatives: false,
-          instructions: false);
-      RouteResponse response = await baatoRoute.getRoutes();
-      String encodedPolyline = response.data?[0].encodedPolyline ?? "";
-
-
-      decodedRoutePoints = decodePolyline(encodedPolyline);
-      setState(() {});
-    }
-
     return Scaffold(
-      body: decodedRoutePoints == []
-          ? const CircularProgressIndicator()
-          : Column(
+      appBar: AppBar(
+        title: Text('Map Page'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Routes List',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            for (String routeName in routeNames)
+              ListTile(
+                title: Text(routeName),
+                onTap: () {
+                  print('Selected route: $routeName');
+                },
+              ),
+          ],
+        ),
+      ),
+      body: Column(
               children: [
                 Expanded(
                   child: FlutterMap(
                     options: const MapOptions(
-                      initialCenter: LatLng(27.717245, 85.323959),
+                      initialCenter: LatLng(27.72, 85.31),
                       initialZoom: 13.0,
                     ),
                     children: [
@@ -112,29 +73,29 @@ class _MapPageState extends State<MapPage> {
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                         userAgentPackageName: 'com.example.app',
                       ),
-                     
                       PolylineLayer(
                         polylines: [
                           Polyline(
                             points: decodedRoutePoints,
                             strokeWidth: 4.0,
-                            color: ktextcolor,
+                            color: Colors.blue,
                           ),
                         ],
                       ),
+                      const MarkerLayer(markers: [
+                        Marker(
+                          width: 80.0,
+                          height: 80.0,
+                          point: LatLng(27.72, 85.31),
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.blue,
+                            size: 40.0,
+                          ),
+                        ),
+                      ]),
                     ],
                   ),
-                ),
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        findRoutes();
-                      },
-                      child: const Text('Find Routes'),
-                    ),
-                  ],
                 ),
               ],
             ),

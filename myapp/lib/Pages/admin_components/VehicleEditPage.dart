@@ -22,7 +22,37 @@ class _VehicleEditPageState extends State<VehicleEditPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
+            TextFormField(
+              initialValue: widget.vehicle['bid'],
+              decoration: const InputDecoration(labelText: 'Vehicle id'),
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              initialValue: widget.vehicle['name'],
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              initialValue: widget.vehicle['type'],
+              decoration: const InputDecoration(labelText: 'Type'),
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              initialValue: widget.vehicle['direction'],
+              decoration: const InputDecoration(labelText: 'Direction'),
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              initialValue: widget.vehicle['route'],
+              decoration: const InputDecoration(labelText: 'Route'),
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                
+              },
+              child: const Text('Edit Vehicle'),
+            ),
             
           ],
         ),
@@ -109,7 +139,7 @@ class _VehicleAddState extends State<VehicleAdd> {
           children: [
             TextFormField(
               controller: bidController,
-              decoration: const InputDecoration(labelText: 'Bid'),
+              decoration: const InputDecoration(labelText: 'Vehicle id'),
             ),
             const SizedBox(height: 16.0),
             TextFormField(
@@ -159,4 +189,50 @@ class _VehicleAddState extends State<VehicleAdd> {
     routeController.dispose();
     super.dispose();
   }
+}
+
+class VehicleShowPage extends StatelessWidget {
+  final Map<String, dynamic> vehicle;
+  const VehicleShowPage({super.key, required Map<String, dynamic> this.vehicle});
+
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Vehicle: ${vehicle['name']}'),
+    ),
+    body: Container(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          ListTile(
+            title: Text('Vehicle id'),
+            subtitle: Text('${vehicle['bid']}'),
+          ),
+          ListTile(
+            title: Text('Name'),
+            subtitle: Text('${vehicle['name']}'),
+          ),
+          ListTile(
+            title: Text('Type'),
+            subtitle: Text('${vehicle['type']}'),
+          ),
+          ListTile(
+            title: Text('Direction'),
+            subtitle: Text('${vehicle['direction']}'),
+          ),
+          ListTile(
+            title: Text('Route'),
+            subtitle: Text('${vehicle['route']}'),
+          ),
+          Center(child: ElevatedButton(onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => VehicleEditPage(vehicle: vehicle),));
+          
+          }, child: Text('Edit')),)
+        ],
+      ),
+    ),
+  );
+}
+
 }

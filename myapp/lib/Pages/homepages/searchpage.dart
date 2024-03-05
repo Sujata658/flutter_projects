@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:myapp/Pages/components/components.dart';
 import 'package:myapp/Pages/components/constants.dart';
 import 'package:myapp/Pages/supportpages/mapRoute.dart';
-import 'package:myapp/Pages/supportpages/routedetail.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -15,128 +14,16 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final MySearchController startLocationController = MySearchController();
-  final MySearchController destinationLocationController = MySearchController();
+  final MySearchController destinationLocationController =
+      MySearchController();
+
   bool isLoading = false;
-  bool hasSearched = false;
-  Map<String, dynamic> gdata = {};
 
   @override
   void dispose() {
     startLocationController.dispose();
     destinationLocationController.dispose();
     super.dispose();
-  }
-
-  Future<void> handleSearch(
-      String startingLocation, String destinationLocation) async {
-    setState(() {
-      isLoading = true;
-      hasSearched = true;
-    });
-    try {
-      final search = {
-        "source": startingLocation,
-        "destination": destinationLocation,
-      };
-
-      final response = await http.post(
-        Uri.parse('http://localhost:5000/search'),
-        body: json.encode(search),
-        headers: {"Content-Type": "application/json"},
-      );
-      setState(() {
-        isLoading = false;
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return MapRoute(routedetails: {}, coordinates: {},);
-        // }));
-      });
-      if (response.statusCode == 200) {
-        setState(() {
-          gdata = jsonDecode(response.body);
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Widget buildSearchResults() {
-    if (isLoading) {
-      return const Column(children: [
-        SizedBox(
-          height: 30,
-        ),
-        Center(child: CircularProgressIndicator())
-      ]);
-    } else if (hasSearched &&
-        gdata.isNotEmpty &&
-        gdata['message'] == "Matching routes found") {
-      // print("gdata:" + gdata.toString());
-      return Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              const Text(
-                'Search Results:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              for (var routeData in gdata['data']) _buildRouteItem(routeData),
-            ],
-          ),
-        ),
-      );
-    } else if (hasSearched) {
-      return Center(child: Text('No matching routes found.'));
-    } else {
-      return Container();
-    }
-  }
-
-  Widget _buildRouteItem(dynamic routeData) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RouteDetail(routeID: routeData['routeId']),
-            ),
-          );
-        },
-        child: ListTile(
-          title: Text('Route: ${routeData['route']}',
-              style: TextStyle(fontWeight: FontWeight.bold, color: ktextcolor)),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Rate: Rs. ${routeData['rate']}',
-                style: const TextStyle(color: Colors.black),
-              ),
-              Text(
-                'Bus: ${routeData['bus']}',
-                style: const TextStyle(color: Colors.black),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -148,21 +35,25 @@ class _SearchPageState extends State<SearchPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SearchBarApp(
-                controller: startLocationController,
-                hintText: "Start Location"),
+              controller: startLocationController,
+              hintText: "Start Location",
+            ),
             SearchBarApp(
               controller: destinationLocationController,
               hintText: "Destination Location",
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                final String startLocation = startLocationController.id;
-                final String destinationLocation =
-                    destinationLocationController.id;
-                handleSearch(startLocation, destinationLocation);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: ktextcolor),
+              onPressed:  () {
+                      final String startLocation =
+                          startLocationController.id;
+                      final String destinationLocation =
+                          destinationLocationController.id;
+                      handleSearch(startLocation, destinationLocation);
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ktextcolor,
+              ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -179,9 +70,69 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
             ),
-            buildSearchResults(),
+            SizedBox(height: 16.0), 
+            isLoading?  Container(
+                          width: 24.0,
+                          height: 24.0,
+                          margin: EdgeInsets.only(right: 8.0),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
+                      : SizedBox.shrink(),
           ],
         ),
+      ),
+    );
+  }
+
+  void handleSearch(
+      String startLocation, String destinationLocation) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final search = {
+        "source": startLocation,
+        "destination": destinationLocation,
+      };
+
+      final searchRes = await http.post(
+        Uri.parse('http://localhost:5000/search'),
+        body: json.encode(search),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (searchRes.statusCode == 200) {
+        Map<String, dynamic> responseData =
+            jsonDecode(searchRes.body);
+
+        if (responseData['message'] == 'Matching routes found') {
+          List<Map<String, dynamic>> routesData =
+              List<Map<String, dynamic>>.from(
+                  responseData['data']);
+
+          if (routesData.isNotEmpty) {
+            nextpage(routesData);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      print('Error in search page: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void nextpage(List<Map<String, dynamic>> routeData) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapRoute(routedetails: routeData),
       ),
     );
   }
