@@ -4,16 +4,19 @@ import 'package:http/http.dart' as http;
 
 class RouteApi {
   static Future<Map<String, List<String>>> getRoutes() async {
-    final response =
-        await http.get(Uri.parse('http://localhost:5000/routeslist'));
+    final response = await http.get(Uri.parse('http://localhost:5000/routes'));
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
-      final List<String> routeNames =
-          (responseData['routeNames'] as List<dynamic>?)?.cast<String>() ?? [];
-      final List<String> routeIds =
-          (responseData['routeIds'] as List<dynamic>?)?.cast<String>() ?? [];
+      final List<String> routeNames = (responseData['routes'] as List<dynamic>?)
+              ?.map<String>((route) => route['name'].toString())
+              .toList() ??
+          [];
+      final List<String> routeIds = (responseData['routes'] as List<dynamic>?)
+              ?.map<String>((route) => route['id'].toString())
+              .toList() ??
+          [];
 
       return {
         'routeNames': routeNames,
@@ -24,7 +27,7 @@ class RouteApi {
     }
   }
 
-  static Future<void> addRoute(String id,String routesName, String starting,
+  static Future<void> addRoute(String id, String routesName, String starting,
       String ending, List<String> stopIds) async {
     try {
       var newRoute = {
@@ -53,15 +56,22 @@ class RouteApi {
     }
   }
 
-static Future<void> getSingleRoute(String id) async{
-  try{
-    var response = http.get(Uri.parse('http://localhost:5000/routes?$id'));
-    
-  }catch(e){
-    print('Error getting single route: $e');
-  }
-}
+  static Future<Map<String, dynamic>> getSingleRoute(String id) async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://localhost:5000/routes/$id'));
 
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        throw Exception('Failed to get single route');
+      }
+    } catch (e) {
+      print('Error getting single route: $e');
+      throw Exception('Error getting single route: $e');
+    }
+  }
 }
 
 class StopApi {
@@ -78,8 +88,6 @@ class StopApi {
           .map((stop) => {
                 'id': stop['id'].toString(),
                 'name': stop['name'],
-                'lat': stop['lat'].toDouble(),
-                'long': stop['long'].toDouble(),
               })
           .toList();
 
@@ -92,7 +100,9 @@ class StopApi {
   }
 }
 
-  static Future<void> addStop(String lat, String lng, String name, BuildContext context) async {
+
+  static Future<void> addStop(
+      String lat, String lng, String name, BuildContext context) async {
     try {
       var newStop = {"lat": lat, "long": lng, "name": name};
 
@@ -120,30 +130,30 @@ class StopApi {
 }
 
 class BusApi {
+  static Future<List<Map<String, dynamic>>> getVehicles() async {
+    final response =
+        await http.get(Uri.parse('http://localhost:5000/vehicles'));
 
-static Future<List<Map<String, dynamic>>> getVehicles() async {
-  final response = await http.get(Uri.parse('http://localhost:5000/vehicles'));
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final List<dynamic> vehiclesData = responseData['vehicles'];
 
-  if (response.statusCode == 200) {
-    final responseData = json.decode(response.body);
-    final List<dynamic> vehiclesData = responseData['vehicles'];
+      List<Map<String, dynamic>> vehiclesList = vehiclesData.map((vehicle) {
+        return {
+          '_id': vehicle['_id'],
+          'bid': vehicle['bid'],
+          'name': vehicle['name'],
+          'type': vehicle['type'],
+          'direction': vehicle['direction'],
+          'route': vehicle['route'],
+        };
+      }).toList();
 
-    List<Map<String, dynamic>> vehiclesList = vehiclesData.map((vehicle) {
-      return {
-        '_id': vehicle['_id'],
-        'bid': vehicle['bid'],
-        'name': vehicle['name'],
-        'type': vehicle['type'],
-        'direction': vehicle['direction'],
-        'route': vehicle['route'],
-      };
-    }).toList();
-
-    return vehiclesList;
-  } else {
-    throw Exception('Failed to load vehicles');
+      return vehiclesList;
+    } else {
+      throw Exception('Failed to load vehicles');
+    }
   }
-}
 
   static Future<Map<String, List<String>>> getVehiclesList() async {
     final response =

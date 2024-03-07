@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/Pages/admin_components/BusView.dart';
+import 'package:myapp/Pages/admin_components/Vehicle/Vehicles.dart';
 import 'package:myapp/Pages/admin_components/FareView.dart';
-import 'package:myapp/Pages/admin_components/RouteView.dart';
-import 'package:myapp/Pages/admin_components/StopsView.dart';
+import 'package:myapp/Pages/admin_components/Routes/Routes.dart';
+import 'package:myapp/Pages/admin_components/Stops/Stops.dart';
+import 'package:myapp/Pages/components/constants.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
@@ -15,14 +16,15 @@ class AdminDashboard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              buildCard('Route', Icons.directions, Icons.edit, context,RouteView()),
-              SizedBox(height: 20.0), 
-              buildCard('Vehicle', Icons.directions_car, Icons.edit,context, BusView()),
-              SizedBox(height: 20.0),
-              buildCard('Stop', Icons.place, Icons.edit, context,StopView()),
-              SizedBox(height: 20.0),
-              buildCard('Fare', Icons.attach_money, Icons.edit, context,FareView()),
+              buildCard('Route', Icons.directions, Icons.edit, context, const Routes(), Colors.blue),
+              const SizedBox(height: 20.0),
+              buildCard('Vehicle', Icons.directions_car, Icons.edit, context, const Vehicles(), Colors.orange),
+              const SizedBox(height: 20.0),
+              buildCard('Stop', Icons.place, Icons.edit, context, const Stops(), Colors.green),
+              const SizedBox(height: 20.0),
+              buildCard('Fare', Icons.attach_money, Icons.edit, context, const FareView(), Colors.purple),
             ],
           ),
         ),
@@ -30,7 +32,7 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  Widget buildCard(String title, IconData iconData, IconData editIcon, BuildContext context,Widget viewPage) {
+  Widget buildCard(String title, IconData iconData, IconData editIcon, BuildContext context, Widget viewPage, Color color) {
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -39,10 +41,18 @@ class AdminDashboard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!), 
+          border: Border.all(color: Colors.grey[300]!),
           borderRadius: BorderRadius.circular(15.0),
+          boxShadow: [
+            BoxShadow(
+              color: kdarkcolor.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,9 +60,9 @@ class AdminDashboard extends StatelessWidget {
             Icon(
               iconData,
               size: 50.0,
-              color: Colors.blue,
+              color: color,
             ),
-            SizedBox(width: 20.0), 
+            const SizedBox(width: 20.0),
             Text(
               title,
               style: const TextStyle(
@@ -60,8 +70,6 @@ class AdminDashboard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(width: 20.0), 
-            
           ],
         ),
       ),
