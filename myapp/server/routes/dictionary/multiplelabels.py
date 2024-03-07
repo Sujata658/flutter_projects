@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 # lat long
 check_list = []
 multiple_labels = {}
+stop_pairs_routes = {}
+
 
 routes = [{
     "_id": {
@@ -1002,20 +1004,71 @@ graph = nx.Graph()
 
 # Add edges to the graph
 
-for route_id, edges in all_edges.items():
-    print("inside ", check_list)
-    for ed in edges:
-        if (ed in check_list):  # 1,2
 
-            multiple_labels[ed] = []
+# def find_routes_for_stops(edges_labels, stop1, stop2):
+#     edge = [str(stop1), str(stop2)]
 
+#     # Check if the edge exists in the dictionary
+#     if edge in edges_labels:
+#         return edges_labels[edge]
+#     else:
+#         return None
+
+
+# # Example usage:
+# stop1 = 1
+# stop2 = 2
+
+# result = find_routes_for_stops(edges_labels, stop1, stop2)
+
+# if result:
+#     print(f"Routes between stops {stop1} and {stop2}: {result}")
+# else:
+#     print(f"No routes found between stops {stop1} and {stop2}")
+
+for route, edges in all_edges.items():
+
+    # edges --- each route list 1,2 2,3
+
+    for stop_pair in edges:
+        key = tuple(map(int, stop_pair))
+        if key in stop_pairs_routes:
+            stop_pairs_routes[key].add(route)
         else:
-            print("adding to the graph")
-            check_list.append(edges)
-            graph.add_edges_from(edges, label=route_id)
+            stop_pairs_routes[key] = {route}
 
-    print(check_list)
-    print("edges", edges)
+    for edge in edges:
+        edge_label = stop_pairs_routes[tuple(map(int, edge))]
+        print("edgelabel ", edge_label)
+        graph.add_edge(edge[0], edge[1], label=edge_label)
+
+print(stop_pairs_routes)
+
+# for ed in edges:
+#     for edges, route_id in all_edges.items():
+#         if (ed in edges):
+#             print("the ed in that edges so route is", route_id)
+#             edge_label.append(route_id)
+
+#     print("ed inside edges", ed)
+#     if (ed in check_list):  # 1,2
+#         print("ede label before adding", edge_label)
+#         print("route_id", route_id)
+#         # edge_label.append(route_id)
+#         print("ede label after adding", edge_label)
+
+#     else:
+#         check_list.append(ed)
+#         print("edge label beforee ", edge_label)
+
+#         if (route_id in edge_label):
+#             print("already")
+#         else:
+#             edge_label.append(route_id)
+#             print("edge label after", edge_label)
+
+#         print("checklist", check_list)
+#         print("edge_label", edge_label)
 
 
 # Function to calculate the distance between two stops
