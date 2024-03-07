@@ -13,6 +13,7 @@ app.use(require("./routes/fare"));
 app.use(require("./routes/stop"));
 app.use(require("./routes/route"));
 app.use(require("./routes/vehicle"));
+app.use(require("./routes/scriptRunner"));
 
 app.listen(port, () => {
   console.log(`server connected at port ${port}`);
