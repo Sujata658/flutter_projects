@@ -31,19 +31,33 @@ router.post("/findShortestPath", (req, res) => {
   ]);
 
   let result = "";
+  let error = "";
 
   pythonProcess.stdout.on("data", (data) => {
     result += data.toString();
   });
 
   pythonProcess.stderr.on("data", (data) => {
-    console.error(`Error: ${data}`);
+    error += data.toString();
   });
 
   pythonProcess.on("close", (code) => {
     console.log(`Python script exited with code ${code}`);
-    // Process the result as needed
-    res.status(200).json({ result });
+
+    if (code === 0) {
+      try {
+        // The result is already in string format, no need to parse
+        res.status(200).send(result);
+      } catch (parseError) {
+        console.error(`Error parsing result: ${parseError}`);
+        res
+          .status(500)
+          .json({ error: "Error parsing result from Python script" });
+      }
+    } else {
+      console.error(`Python script error: ${error}`);
+      res.status(500).json({ error: "Error running Python script" });
+    }
   });
 });
 

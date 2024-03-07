@@ -1017,10 +1017,7 @@ for route, edges in all_edges.items():
 
     for edge in edges:
         edge_label = stop_pairs_routes[tuple(map(int, edge))]
-        print("edgelabel ", edge_label)
         graph.add_edge(edge[0], edge[1], label=edge_label)
-
-print(stop_pairs_routes)
 
 
 def calculate_distance(stop1, stop2):
@@ -1068,17 +1065,17 @@ try:
     # print("change point:", changePoint)
 
     result = {
-        "shortest_path": shortest_path,
-        "routes": shortest_routes,
+        "shortest_path": list(shortest_path),
+        "routes": list(shortest_routes),
         "shortest_distance": shortest_distance,
         "change point": changePoint
     }
 
 # Convert the result to a JSON-formatted string
-    result_json = json.dumps(result)
+    # result_json = json.dumps(list(result))
 
 # Print the JSON result to the standard output
-    print(result_json)
+    print(result)
 
     # # Visualize the graph with the shortest path highlighted
     # nx.draw(graph, pos=pos_dict, with_labels=False,
