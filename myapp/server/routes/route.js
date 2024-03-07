@@ -87,5 +87,54 @@ router.get("/routes/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch route by ID" });
   }
 });
+router.put("/route/:id", async (req, res) => {
+  try {
+    const { id, name, start, end, stops_list } = req.body;
+    const routeId = req.params.id;
+
+    if (!id || !name || !start || !end || !stops_list) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const updatedroute = await Route.findByIdAndUpdate(
+      routeId,
+      {
+        id,
+        name,
+        start,
+        end,
+        stops_list,
+      },
+      { new: true }
+    );
+
+    if (!updatedroute) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    res.json({ success: true, message: updatedroute });
+  } catch (error) {
+    console.error("Error updating route:", error);
+    res.status(500).json({ error: "Failed to update route" });
+  }
+});
+
+// Delete route by ID
+router.delete("/route/:id", async (req, res) => {
+  try {
+    const routeId = req.params.id;
+
+    const deletedroute = await Route.findByIdAndDelete(routeId);
+
+    if (!deletedroute) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    res.json({ success: true, message: "route deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting route:", error);
+    res.status(500).json({ error: "Failed to delete route" });
+  }
+});
 
 module.exports = router;

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 # lat long
 check_list = []
 multiple_labels = {}
+stop_pairs_routes = {}
+
 
 routes = [{
     "_id": {
@@ -1000,25 +1002,24 @@ for route_id, edges in edges_by_route.items():
 # Create a graph
 graph = nx.Graph()
 
-# Add edges to the graph
 
-for route_id, edges in all_edges.items():
-    print("inside ", check_list)
-    for ed in edges:
-        if (ed in check_list):  # 1,2
+for route, edges in all_edges.items():
 
-            multiple_labels[ed] = []
+    # edges --- each route list 1,2 2,3
 
+    for stop_pair in edges:
+        key = tuple(map(int, stop_pair))
+        if key in stop_pairs_routes:
+            stop_pairs_routes[key].add(route)
         else:
-            print("adding to the graph")
-            check_list.append(edges)
-            graph.add_edges_from(edges, label=route_id)
+            stop_pairs_routes[key] = {route}
 
-    print(check_list)
-    print("edges", edges)
+    for edge in edges:
+        edge_label = stop_pairs_routes[tuple(map(int, edge))]
+        # print("edgelabel ", edge_label)
+        graph.add_edge(edge[0], edge[1], label=edge_label)
 
-
-# Function to calculate the distance between two stops
+# print(stop_pairs_routes)
 
 
 def calculate_distance(stop1, stop2):

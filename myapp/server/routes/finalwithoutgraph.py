@@ -1,10 +1,13 @@
 from geopy.distance import great_circle
 import networkx as nx
 import matplotlib.pyplot as plt
+import json
 # done up to
 # lat long
 check_list = []
 multiple_labels = {}
+stop_pairs_routes = {}
+
 
 routes = [{
     "_id": {
@@ -1000,25 +1003,24 @@ for route_id, edges in edges_by_route.items():
 # Create a graph
 graph = nx.Graph()
 
-# Add edges to the graph
 
-for route_id, edges in all_edges.items():
-    print("inside ", check_list)
-    for ed in edges:
-        if (ed in check_list):  # 1,2
+for route, edges in all_edges.items():
 
-            multiple_labels[ed] = []
+    # edges --- each route list 1,2 2,3
 
+    for stop_pair in edges:
+        key = tuple(map(int, stop_pair))
+        if key in stop_pairs_routes:
+            stop_pairs_routes[key].add(route)
         else:
-            print("adding to the graph")
-            check_list.append(edges)
-            graph.add_edges_from(edges, label=route_id)
+            stop_pairs_routes[key] = {route}
 
-    print(check_list)
-    print("edges", edges)
+    for edge in edges:
+        edge_label = stop_pairs_routes[tuple(map(int, edge))]
+        print("edgelabel ", edge_label)
+        graph.add_edge(edge[0], edge[1], label=edge_label)
 
-
-# Function to calculate the distance between two stops
+print(stop_pairs_routes)
 
 
 def calculate_distance(stop1, stop2):
@@ -1040,7 +1042,13 @@ def find_shortest_path(graph, start_stop, end_stop):
         routes = [graph[path[i]][path[i + 1]]['label']
                   for i in range(len(path) - 1)]
 
-        return path, distance, routes
+        for i, route_set in enumerate(routes):
+            if len(route_set) > 1:
+                change_point = i
+                break
+        changePoint = str(path[i])
+
+        return path, distance, routes, changePoint
     except nx.NetworkXNoPath:
         raise ValueError(f"No path found between stops {
                          start_stop} and {end_stop}")
@@ -1052,35 +1060,50 @@ end_stop = 16
 
 # Print the result
 try:
-    shortest_path, shortest_distance, shortest_routes = find_shortest_path(
+    shortest_path, shortest_distance, shortest_routes, changePoint = find_shortest_path(
         graph, start_stop, end_stop)
-    print("Shortest Path:", shortest_path)
-    print("Shortest Distance:", shortest_distance, "meters")
-    print("Routes:", shortest_routes)
+    # print("Shortest Path:", shortest_path)
+    # print("Shortest Distance:", shortest_distance, "meters")
+    # print("Routes:", shortest_routes)
+    # print("change point:", changePoint)
 
-    # Visualize the graph with the shortest path highlighted
-    nx.draw(graph, pos=pos_dict, with_labels=False,
-            node_size=100, node_color='lightblue')
+    result = {
+        "shortest_path": shortest_path,
+        "routes": shortest_routes,
+        "shortest_distance": shortest_distance,
+        "change point": changePoint
+    }
 
-    # Highlight the shortest path
-    highlighted_edges = [(shortest_path[i], shortest_path[i + 1])
-                         for i in range(len(shortest_path) - 1)]
-    nx.draw_networkx_edges(
-        graph, pos=pos_dict, edgelist=highlighted_edges, edge_color='red', width=2)
+# Convert the result to a JSON-formatted string
+    result_json = json.dumps(result)
 
-    # Add labels to nodes
-    node_labels = {node: stops[int(node) - 1]['name'] for node in pos_dict}
-    nx.draw_networkx_labels(
-        graph, pos=pos_dict, labels=node_labels, font_size=8, font_color='black')
+# Print the JSON result to the standard output
+    print(result_json)
 
-    # Add labels to edges
-    labels = nx.get_edge_attributes(graph, 'label')
-    for edge, label in labels.items():
-        x, y = (pos_dict[edge[0]][0] + pos_dict[edge[1]][0]) / \
-            2, (pos_dict[edge[0]][1] + pos_dict[edge[1]][1]) / 2
-        plt.text(x, y, label, fontsize=8, ha='center', va='center')
+    # # Visualize the graph with the shortest path highlighted
+    # nx.draw(graph, pos=pos_dict, with_labels=False,
+    #         node_size=100, node_color='lightblue')
 
-    plt.show()
+    # # Highlight the shortest path
+    # highlighted_edges = [(shortest_path[i], shortest_path[i + 1])
+    #                      for i in range(len(shortest_path) - 1)]
+    # nx.draw_networkx_edges(
+    #     graph, pos=pos_dict, edgelist=highlighted_edges, edge_color='red', width=2)
+
+    # # Add labels to nodes
+    # node_labels = {node: stops[int(node) - 1]['name'] for node in pos_dict}
+    # nx.draw_networkx_labels(
+    #     graph, pos=pos_dict, labels=node_labels, font_size=8, font_color='black')
+
+    # # Add labels to edges
+    # labels = nx.get_edge_attributes(graph, 'label')
+    # for edge, label in labels.items():
+    #     x, y = (pos_dict[edge[0]][0] + pos_dict[edge[1]][0]) / \
+    #         2, (pos_dict[edge[0]][1] + pos_dict[edge[1]][1]) / 2
+    #     plt.text(x, y, label, fontsize=8, ha='center', va='center')
+
+    # plt.show()
 
 except ValueError as e:
+
     print(e)

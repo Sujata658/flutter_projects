@@ -65,4 +65,52 @@ router.get("/stops/:id", async (req, res) => {
   }
 });
 
+router.put("/stop/:id", async (req, res) => {
+  try {
+    const { id, lat, long, name } = req.body;
+    const stopId = req.params.id;
+
+    if (!lat || !long || !name || !id) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const updatedstop = await Stop.findByIdAndUpdate(
+      stopId,
+      {
+        id,
+        lat,
+        long,
+        name,
+      },
+      { new: true }
+    );
+
+    if (!updatedstop) {
+      return res.status(404).json({ error: "stop not found" });
+    }
+
+    res.json({ success: true, message: updatedstop });
+  } catch (error) {
+    console.error("Error updating stop:", error);
+    res.status(500).json({ error: "Failed to update stop" });
+  }
+});
+
+// Delete stop by ID
+router.delete("/stop/:id", async (req, res) => {
+  try {
+    const stopId = req.params.id;
+
+    const deletedstop = await Stop.findByIdAndDelete(stopId);
+
+    if (!deletedstop) {
+      return res.status(404).json({ error: "stop not found" });
+    }
+
+    res.json({ success: true, message: "stop deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting stop:", error);
+    res.status(500).json({ error: "Failed to delete stop" });
+  }
+});
 module.exports = router;
