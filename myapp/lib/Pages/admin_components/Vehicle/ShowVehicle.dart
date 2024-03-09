@@ -14,7 +14,7 @@ class ShowVehicle extends StatelessWidget {
         title: Text('${vehicle['name']}'),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: () {
               Navigator.push(
                 context,
@@ -30,42 +30,39 @@ class ShowVehicle extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            _buildInfoTile('Vehicle id', '${vehicle['bid']}'),
+            _buildInfoTile('Vehicle id', '${vehicle['vid']}'),
             _buildInfoTile('Name', '${vehicle['name']}'),
             _buildInfoTile('Type', '${vehicle['type']}'),
-            _buildInfoTile('Direction', '${vehicle['direction']}'),
-            _buildInfoTile('Route', '${vehicle['route']}'),
           ],
         ),
       ),
     );
   }
 
- Widget _buildInfoTile(String title, String subtitle) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 8.0),
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.grey[300]!),
-      borderRadius: BorderRadius.circular(8.0),
-      boxShadow: [
-        BoxShadow(
-          color: kdarkcolor.withOpacity(0.5),
-          spreadRadius: 2,
-          blurRadius: 5,
-          offset: const Offset(0, 3),
-        ),
-      ],
-    ),
-    child: ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
+  Widget _buildInfoTile(String title, String subtitle) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: kdarkcolor.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      subtitle: Text(subtitle),
-    ),
-  );
-}
-
+      child: ListTile(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(subtitle),
+      ),
+    );
+  }
 }

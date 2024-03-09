@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:myapp/Pages/components/bottomnav.dart';
 import 'package:myapp/Pages/components/constants.dart';
 import 'package:myapp/Pages/homepages/map.dart';
@@ -55,45 +58,30 @@ class _HomeState extends State<Home> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({
-    super.key,
-  });
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String _getMonthName(int month) {
-  switch (month) {
-    case 1:
-      return 'January';
-    case 2:
-      return 'February';
-    case 3:
-      return 'March';
-    case 4:
-      return 'April';
-    case 5:
-      return 'May';
-    case 6:
-      return 'June';
-    case 7:
-      return 'July';
-    case 8:
-      return 'August';
-    case 9:
-      return 'September';
-    case 10:
-      return 'October';
-    case 11:
-      return 'November';
-    case 12:
-      return 'December';
-    default:
-      return '';
+  late LatLng _userLocation;
+  bool isfetched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserLocation();
   }
-}
+
+  Future<void> getUserLocation() async {
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _userLocation = LatLng(position.latitude, position.longitude);
+      isfetched = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,98 +95,37 @@ class _HomePageState extends State<HomePage> {
                 height: 15,
               ),
               SizedBox(
-                height: 310,
-                child: Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  children: [
-                    Hero(
-                      tag: 'blue_card',
-                      child: Material(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 270,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(15.0),
-                            ),
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 30),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          const Icon(
-                                            Icons.location_city,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                          
-                                          Text(
-                                            '${DateTime.now().hour}:${DateTime.now().minute}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        '${DateTime.now().day}',
-                                        style: const TextStyle(
-                                          height: 1.1,
-                                          fontSize: 50,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Text(
-                                        _getMonthName(DateTime.now().month),
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          height: 0.2,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                height: 250,
+                child:isfetched == false
+                    ? const Center(child: CircularProgressIndicator())
+                    : FlutterMap(
+                        options: MapOptions(
+                          initialCenter: _userLocation,
+                          initialZoom: 13.0,
+                          maxZoom: 18.0,
                         ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.app',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                width: 80.0,
+                                height: 80.0,
+                                point: _userLocation,
+                                child: const Icon(
+                                  Icons.location_on,
+                                  color: Colors.red,
+                                  size: 40.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 20.0),
-                      child: Text('Perfect time to travel 🎏',
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500)),
-                    ),
-                    Positioned(
-                        top: 0,
-                        right: 10,
-                        child: Image.asset(
-                          "assets/images/ladder.png",
-                          height: 180,
-                        ))
-                  ],
-                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 25),
@@ -207,11 +134,12 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     "Explore Routes",
                     style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? ktitlecolor
-                            : klightcolor,
-                        fontWeight: FontWeight.w500),
+                      fontSize: 20,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? ktitlecolor
+                          : klightcolor,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

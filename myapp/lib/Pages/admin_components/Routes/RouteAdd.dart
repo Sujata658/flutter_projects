@@ -47,15 +47,35 @@ class _RouteAddState extends State<RouteAdd> {
             ),
             const SizedBox(height: 16.0),
             const Text('Stops:'),
-            ...stopControllers.map((controller) => SearchBarApp(
-                  controller: controller,
+            ListView.builder(
+            shrinkWrap: true,
+            itemCount: stopControllers.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: SearchBarApp(
+                  controller: stopControllers[index],
                   hintText: 'Stop ID',
-                )),
+                )
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      setState(() {
+                        stopControllers.removeAt(index);
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+                
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  // stopControllers.add(TextEditingController());
                   stopControllers.add(MySearchController());
                 });
               },
@@ -97,8 +117,7 @@ class _RouteAddState extends State<RouteAdd> {
           content: Text('Route added'),
         ),
       );
-      widget.onRouteAdded();
-      Navigator.pop(context);
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       print('Error adding route: $e');
     }

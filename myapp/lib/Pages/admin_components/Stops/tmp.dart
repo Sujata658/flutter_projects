@@ -12,7 +12,11 @@ class Stops extends StatefulWidget {
 
 class _StopsState extends State<Stops> {
   List<String> stopNames = [];
-  List<Map<String, dynamic>> stopInfo = [];
+  List<String> filteredStopNames = [];
+  List<String> id = [];
+  List<String> filteredId = [];
+  List<String> Ids = [];
+  List<String> filteredIds = [];
 
   @override
   void initState() {
@@ -24,19 +28,36 @@ class _StopsState extends State<Stops> {
     try {
       final response = await StopApi.getStops();
 
-      final List<String> stopNamesList = [];
+      final List<String> filteredStopNamesList = [];
+      final List<String> filteredIdList = [];
+      final List<String> idList = [];
+      final List<String> IdsList = [];
 
       for (var i = 0; i < response.length; i++) {
-        stopNamesList.add(response[i]['name']);
+        filteredStopNamesList.add(response[i]['name']);
+        IdsList.add(response[i]['Id']);
+        idList.add(response[i]['id']);
+        filteredIdList.add(response[i]['id']);
       }
 
       setState(() {
-        stopNames = stopNamesList;
-        stopInfo = response;
+        stopNames = filteredStopNamesList;
+        Ids = IdsList;
+        id = idList;
+        filteredId = filteredIdList;
       });
     } catch (error) {
       print('Error fetching stops: $error');
     }
+  }
+
+  void filterStops(String query) {
+    setState(() {
+      filteredStopNames = stopNames
+          .where((stopName) =>
+              stopName.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -50,7 +71,7 @@ class _StopsState extends State<Stops> {
             onPressed: () async {
               final String? result = await showSearch(
                 context: context,
-                delegate: _StopsSearchDelegate(stopNames, stopInfo),
+                delegate: _StopsSearchDelegate(filteredStopNames, Ids, id),
               );
 
               if (result != null) {}
@@ -65,18 +86,18 @@ class _StopsState extends State<Stops> {
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: stopNames.length,
+                itemCount: filteredStopNames.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(stopNames[index]),
+                    title: Text(filteredStopNames[index]),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => StopShow(
-                            stopName: stopNames[index],
-                            Ids: stopInfo[index]['id'],
-                            id: stopInfo[index]['id'],
+                            stopName: filteredStopNames[index],
+                            Ids: Ids[index],
+                            id: id[index],
                           ),
                         ),
                       );
@@ -110,9 +131,10 @@ class _StopsState extends State<Stops> {
 
 class _StopsSearchDelegate extends SearchDelegate<String> {
   final List<String> stopsList;
-  final List<Map<String, dynamic>> stopInfo;
+  final List<String> Ids;
+  final List<String> id;
 
-  _StopsSearchDelegate(this.stopsList, this.stopInfo);
+  _StopsSearchDelegate(this.stopsList, this.Ids, this.id);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -145,9 +167,10 @@ class _StopsSearchDelegate extends SearchDelegate<String> {
   Widget buildSuggestions(BuildContext context) {
     final suggestionList = stopsList
         .where(
-          (stopName) => stopName.toLowerCase().contains(query.toLowerCase()),
-        )
+            (stopName) => stopName.toLowerCase().contains(query.toLowerCase()))
         .toList();
+    final Ids = this.Ids;
+    final id = this.id;
 
     return ListView.builder(
       itemCount: suggestionList.length,
@@ -155,18 +178,11 @@ class _StopsSearchDelegate extends SearchDelegate<String> {
         return ListTile(
           title: Text(suggestionList[index]),
           onTap: () {
-            final selectedStopInfo = stopInfo.firstWhere(
-              (info) => info['name'] == suggestionList[index],
-            );
-
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => StopShow(
-                  stopName: suggestionList[index],
-                  Ids: selectedStopInfo['Id'],
-                  id: selectedStopInfo['id'],
-                ),
+                builder: (context) =>
+                    StopShow(stopName: suggestionList[index], Ids: Ids[index], id: id[index]),
               ),
             );
           },
@@ -175,5 +191,3 @@ class _StopsSearchDelegate extends SearchDelegate<String> {
     );
   }
 }
-
-

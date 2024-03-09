@@ -14,8 +14,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final MySearchController startLocationController = MySearchController();
-  final MySearchController destinationLocationController =
-      MySearchController();
+  final MySearchController destinationLocationController = MySearchController();
 
   bool isLoading = false;
 
@@ -44,13 +43,12 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed:  () {
-                      final String startLocation =
-                          startLocationController.id;
-                      final String destinationLocation =
-                          destinationLocationController.id;
-                      handleSearch(startLocation, destinationLocation);
-                    },
+              onPressed: () {
+                final String startLocation = startLocationController.id;
+                final String destinationLocation =
+                    destinationLocationController.id;
+                handleSearch(startLocation, destinationLocation);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: ktextcolor,
               ),
@@ -70,24 +68,24 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
             ),
-            SizedBox(height: 16.0), 
-            isLoading?  Container(
-                          width: 24.0,
-                          height: 24.0,
-                          margin: EdgeInsets.only(right: 8.0),
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                        )
-                      : SizedBox.shrink(),
+            const SizedBox(height: 16.0),
+            isLoading
+                ? Container(
+                    width: 24.0,
+                    height: 24.0,
+                    margin: const EdgeInsets.only(right: 8.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ],
         ),
       ),
     );
   }
 
-  void handleSearch(
-      String startLocation, String destinationLocation) async {
+  void handleSearch(String startLocation, String destinationLocation) async {
     setState(() {
       isLoading = true;
     });
@@ -105,17 +103,21 @@ class _SearchPageState extends State<SearchPage> {
       );
 
       if (searchRes.statusCode == 200) {
-        Map<String, dynamic> responseData =
-            jsonDecode(searchRes.body);
+        Map<String, dynamic> responseData = jsonDecode(searchRes.body);
 
         if (responseData['message'] == 'Matching routes found') {
           List<Map<String, dynamic>> routesData =
-              List<Map<String, dynamic>>.from(
-                  responseData['data']);
+              List<Map<String, dynamic>>.from(responseData['data']);
 
           if (routesData.isNotEmpty) {
             nextpage(routesData);
             return;
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No matching routes found'),
+              ),
+            );
           }
         }
       }

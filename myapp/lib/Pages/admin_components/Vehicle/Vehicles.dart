@@ -19,16 +19,16 @@ class _VehiclesState extends State<Vehicles> {
   @override
   void initState() {
     super.initState();
-    fetchRoutes();
+    fetchVehicles();
   }
 
-  void fetchRoutes() async {
+  void fetchVehicles() async {
     try {
-      final response = await BusApi.getVehicles();
+      final response = await VehicleApi.getVehicles();
 
       setState(() {
         vehicles = response;
-        filteredVehicles = vehicles; 
+        filteredVehicles = vehicles;
         isDataLoaded = true;
       });
     } catch (e) {
@@ -44,21 +44,20 @@ class _VehiclesState extends State<Vehicles> {
       ),
     ).then((value) {
       if (value != null && value) {
-        fetchRoutes();
+        fetchVehicles();
       }
     });
   }
 
   void onVehicleAdded() {
-    fetchRoutes();
+    fetchVehicles();
   }
 
   void filterVehicles(String query) {
     setState(() {
       filteredVehicles = vehicles
           .where((vehicle) =>
-              vehicle['name'].toLowerCase().contains(query.toLowerCase()) ||
-              vehicle['route'].toLowerCase().contains(query.toLowerCase()))
+              vehicle['name'].toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -87,7 +86,6 @@ class _VehiclesState extends State<Vehicles> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  
                   const SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
@@ -105,8 +103,7 @@ class _VehiclesState extends State<Vehicles> {
                           );
                         },
                         child: ListTile(
-                          title: Text(
-                              '${filteredVehicles[index]['name']} - ${filteredVehicles[index]['route']}'),
+                          title: Text('${filteredVehicles[index]['name']}'),
                         ),
                       );
                     },
@@ -172,26 +169,32 @@ class VehicleSearchDelegate extends SearchDelegate {
   }
 
   @override
-  Widget buildSuggestions(BuildContext context) {
-    final List<Map<String, dynamic>> suggestedVehicles = query.isEmpty
-        ? vehicles
-        : vehicles
-            .where((vehicle) =>
-                vehicle['name'].toLowerCase().contains(query.toLowerCase()) ||
-                vehicle['route'].toLowerCase().contains(query.toLowerCase()))
-            .toList();
+Widget buildSuggestions(BuildContext context) {
+  final List<Map<String, dynamic>> suggestedVehicles = query.isEmpty
+      ? vehicles
+      : vehicles
+          .where((vehicle) =>
+              vehicle['name'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
 
-    return ListView.builder(
-      itemCount: suggestedVehicles.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(
-              '${suggestedVehicles[index]['name']} - ${suggestedVehicles[index]['route']}'),
-          onTap: () {
-            close(context, suggestedVehicles[index]);
-          },
-        );
-      },
-    );
-  }
+  return ListView.builder(
+    itemCount: suggestedVehicles.length,
+    itemBuilder: (context, index) {
+      return ListTile(
+        title: Text('${suggestedVehicles[index]['name']}'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ShowVehicle(
+                vehicle: suggestedVehicles[index],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 }

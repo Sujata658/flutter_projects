@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin_components/apis.dart';
 import './constants.dart';
 
-class MySearchController extends SearchController {
-  String id = "";
-
-  void setText(String newText) {
-    text = newText;
-    id = "";
-    notifyListeners();
-  }
-}
 
 class CustomButton extends StatelessWidget {
   const CustomButton(
@@ -272,5 +263,15 @@ class _SearchBarAppState extends State<SearchBarApp> {
         },
       ),
     );
+  }
+}
+
+class MySearchController extends SearchController {
+  String id = "";
+
+  void setText(String newText) {
+    text = newText;
+    id = "";
+    notifyListeners();
   }
 }

@@ -13,6 +13,7 @@ class Routes extends StatefulWidget {
 class _RoutesState extends State<Routes> {
   List<String> routesNames = [];
   List<String> routesIds = [];
+  List<String> Ids = [];
   List<String> filteredRoutes = [];
   bool isDataLoaded = false;
   TextEditingController searchController = TextEditingController();
@@ -30,6 +31,7 @@ class _RoutesState extends State<Routes> {
         setState(() {
           routesNames = routesData['routeNames'] ?? [];
           routesIds = routesData['routeIds'] ?? [];
+          Ids = routesData['ids'] ?? [];
           filteredRoutes = routesNames;
           isDataLoaded = true;
         });
@@ -39,13 +41,13 @@ class _RoutesState extends State<Routes> {
     }
   }
 
-
-  void navigateToRoutesViewPage(String routesId, String routesName) {
+  void navigateToRoutesViewPage(
+      String routesId, String routesName, String Ids) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ShowRoute(routesId: routesId, routesName: routesName),
+            ShowRoute(routesId: routesId, routesName: routesName, Ids: Ids),
       ),
     );
   }
@@ -69,7 +71,8 @@ class _RoutesState extends State<Routes> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: RouteSearchDelegate(routesNames),
+                delegate: RouteSearchDelegate(
+                    routes: routesNames, routesIds: routesIds),
               );
             },
           ),
@@ -88,9 +91,8 @@ class _RoutesState extends State<Routes> {
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () {
-                            
-                            navigateToRoutesViewPage(
-                                routesIds[index], filteredRoutes[index]);
+                            navigateToRoutesViewPage(routesIds[index],
+                                filteredRoutes[index], Ids[index]);
                           },
                           child: ListTile(
                             title: Text(filteredRoutes[index]),
@@ -131,8 +133,9 @@ class _RoutesState extends State<Routes> {
 
 class RouteSearchDelegate extends SearchDelegate<String> {
   final List<String> routes;
+  final List<String> routesIds;
 
-  RouteSearchDelegate(this.routes);
+  RouteSearchDelegate({required this.routes, required this.routesIds});
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -175,7 +178,16 @@ class RouteSearchDelegate extends SearchDelegate<String> {
         return ListTile(
           title: Text(suggestionList[index]),
           onTap: () {
-            close(context, suggestionList[index]);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ShowRoute(
+                  routesId: routesIds[index],
+                  routesName: suggestionList[index],
+                  Ids: routesIds[index],
+                ),
+              ),
+            );
           },
         );
       },
