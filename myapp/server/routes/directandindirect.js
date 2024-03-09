@@ -93,8 +93,7 @@ router.post("/search", async (req, res) => {
         resolvedData.map((data) => {
           resultArray.push(data);
         });
-        console.log("line 72", resultArray);
-        console.log("resolved ata line 75", resolvedData);
+
         return res.status(200).json({
           message: "Matching routes found 113",
           data: resolvedData,
@@ -178,34 +177,41 @@ router.post("/search", async (req, res) => {
       error += data.toString();
     });
 
-    pythonProcess.on("close", (code) => {
+    pythonProcess.on("close", async (code) => {
       console.log(`Python script exited with code ${code}`);
 
       if (code === 0) {
         try {
           // The result is already in string format, no need to parse
-          console.log("indirect result", result);
-          const cleanedJsonString = result.replace(/\r?\n/g, "");
+          const parsedResult = JSON.parse(result);
+          console.log("indirect result", parsedResult);
+          let stops_list = parsedResult.shortest_path;
+          // console.log(stops_list);
 
-          // Parse the cleaned JSON string
-          //   const jsonData = JSON.parse(cleanedJsonString);
-          //   console.log(jsonData);
-          //   const resultd = JSON.parse(result);
-          //   console.log("type of ", typeof resultd);
-          //   console.log(resultd["shortest_path"]);
-          //   console.log(resultd[0].shortest_path);
-          //   console.log(resultd["shortest_path"]);
-          //   console.log(resultd.routes);
+          const latlongData = await Promise.all(
+            stops_list.map(async (stop) => {
+              // console.log("lat long data", stopIdToLatLong(stop));
+              return await stopIdToLatLong(stop);
+              // Reverse the array before returning
+            })
+          );
           const temp = [
             {
               flag: "indirect",
-              result,
+
               //   result,
+              shortest_path: parsedResult.shortest_path,
+              routes: parsedResult.routes,
+              two_routes: parsedResult.two_routes,
+              change_point: parsedResult.change_point,
+              shortest_distance: parsedResult.shortest_distance,
+              lat_long: latlongData,
             },
           ];
-          resultArray.push(temp);
-          console.log(resultArray);
-          res.status(200).json(result);
+          // resultArray.push(temp);
+          // console.log(parsedResult);
+
+          res.status(200).json(temp);
         } catch (parseError) {
           console.error(`Error parsing result: ${parseError}`);
           res
@@ -219,7 +225,7 @@ router.post("/search", async (req, res) => {
     });
     // console.log("indirect result", result);
 
-    // return res.status(422).json({ error: "No matching routes found" });
+    // return res.status(422).json({ errorf: "No matching routes found" });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Internal Server Error" });

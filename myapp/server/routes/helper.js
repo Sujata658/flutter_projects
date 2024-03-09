@@ -104,9 +104,9 @@ const stopIdToStopName = async (stopId) => {
 };
 const stopIdToLatLong = async (stopId) => {
   try {
-    console.log(stopId);
+    // console.log(stopId);
     const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
-    console.log(foundstop);
+    // console.log(foundstop);
     if (foundstop) {
       const coordinates = { lat: foundstop.lat, long: foundstop.long };
       return coordinates;

@@ -2,8 +2,13 @@ from geopy.distance import great_circle
 import networkx as nx
 import matplotlib.pyplot as plt
 import json
-# done up to
-# lat long
+
+import sys
+
+# Get source and destination from command-line arguments
+source = sys.argv[1]
+destination = sys.argv[2]
+
 check_list = []
 multiple_labels = {}
 stop_pairs_routes = {}
@@ -1004,32 +1009,7 @@ for route_id, edges in edges_by_route.items():
 graph = nx.Graph()
 
 for route_id, edges in all_edges.items():
-    # print("inside ", check_list)
-    for ed in edges:
-        if (ed in check_list):  # 1,2
-
-            multiple_labels[ed] = []
-
-        else:
-            print("adding to the graph")
-            check_list.append(edges)
-            graph.add_edges_from(edges, label=route_id)
-
-
-# for route, edges in all_edges.items():
-
-    # edges --- each route list 1,2 2,3
-
-    # for stop_pair in edges:
-    #     key = tuple(map(int, stop_pair))
-    #     if key in stop_pairs_routes:
-    #         stop_pairs_routes[key].add(route)
-    #     else:
-    #         stop_pairs_routes[key] = {route}
-
-    # for edge in edges:
-    #     edge_label = stop_pairs_routes[tuple(map(int, edge))]
-    #     graph.add_edge(edge[0], edge[1], label=edge_label)
+    graph.add_edges_from(edges, label=route_id)
 
 
 def calculate_distance(stop1, stop2):
@@ -1064,13 +1044,11 @@ def find_shortest_path(graph, start_stop, end_stop):
 
 
 # Example: Find shortest path, distance, and routes between Lagankhel (stop 1) and Kumaripati (stop 2)
-start_stop = 20
-end_stop = 16
 
 # Print the result
 try:
     shortest_path, shortest_distance, shortest_routes, changePoint = find_shortest_path(
-        graph, start_stop, end_stop)
+        graph, source, destination)
     # print("Shortest Path:", shortest_path)
     # print("Shortest Distance:", shortest_distance, "meters")
     # print("Routes:", shortest_routes)
@@ -1088,12 +1066,17 @@ try:
     # print(unique_elements
 
     result = {
-        "shortest_path": list(shortest_path),
-        "routes": list(shortest_routes),
+        "shortest_path": (shortest_path),
+        "routes": (shortest_routes),
         "two_routes": unique_elements,
         "shortest_distance": shortest_distance,
         "change_point": changePoint
     }
+    # Convert to JSON
+    json_result = json.dumps(result, indent=2)
+
+# Print or save the JSON
+    print(json_result)
 
 # Convert the result to a JSON-formatted string
     # result_json = json.dumps(list(result))
