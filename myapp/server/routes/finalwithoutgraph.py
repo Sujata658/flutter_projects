@@ -1003,21 +1003,33 @@ for route_id, edges in edges_by_route.items():
 # Create a graph
 graph = nx.Graph()
 
+for route_id, edges in all_edges.items():
+    # print("inside ", check_list)
+    for ed in edges:
+        if (ed in check_list):  # 1,2
 
-for route, edges in all_edges.items():
+            multiple_labels[ed] = []
+
+        else:
+            print("adding to the graph")
+            check_list.append(edges)
+            graph.add_edges_from(edges, label=route_id)
+
+
+# for route, edges in all_edges.items():
 
     # edges --- each route list 1,2 2,3
 
-    for stop_pair in edges:
-        key = tuple(map(int, stop_pair))
-        if key in stop_pairs_routes:
-            stop_pairs_routes[key].add(route)
-        else:
-            stop_pairs_routes[key] = {route}
+    # for stop_pair in edges:
+    #     key = tuple(map(int, stop_pair))
+    #     if key in stop_pairs_routes:
+    #         stop_pairs_routes[key].add(route)
+    #     else:
+    #         stop_pairs_routes[key] = {route}
 
-    for edge in edges:
-        edge_label = stop_pairs_routes[tuple(map(int, edge))]
-        graph.add_edge(edge[0], edge[1], label=edge_label)
+    # for edge in edges:
+    #     edge_label = stop_pairs_routes[tuple(map(int, edge))]
+    #     graph.add_edge(edge[0], edge[1], label=edge_label)
 
 
 def calculate_distance(stop1, stop2):
@@ -1064,18 +1076,30 @@ try:
     # print("Routes:", shortest_routes)
     # print("change point:", changePoint)
 
+    unique_elements = []
+    seen_elements = []
+
+    for element in shortest_routes:
+
+        if element not in seen_elements:
+            unique_elements.append(element)
+            seen_elements.append(element)
+
+    # print(unique_elements
+
     result = {
         "shortest_path": list(shortest_path),
         "routes": list(shortest_routes),
+        "two_routes": unique_elements,
         "shortest_distance": shortest_distance,
-        "change point": changePoint
+        "change_point": changePoint
     }
 
 # Convert the result to a JSON-formatted string
     # result_json = json.dumps(list(result))
 
 # Print the JSON result to the standard output
-    print(result)
+    # print(result)
 
     # # Visualize the graph with the shortest path highlighted
     # nx.draw(graph, pos=pos_dict, with_labels=False,

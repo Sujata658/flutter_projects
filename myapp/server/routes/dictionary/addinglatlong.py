@@ -3,6 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 # done up to lat long
 
+
 routes = [{
     "_id": {
         "$oid": "658aeff1a94e5a96649b04d1"

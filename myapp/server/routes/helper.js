@@ -42,7 +42,7 @@ const routeToId = async (routename) => {
 const busIdToBus = async (busId) => {
   try {
     console.log("busid", busId);
-    const foundbus = await Bus.findOne({ bid: busId });
+    const foundbus = await Bus.findOne({ busId: busId });
 
     if (foundbus) {
       console.log("found bus's  from id ", foundbus);

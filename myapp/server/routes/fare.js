@@ -15,6 +15,7 @@ router.post("/addFare", async (req, res) => {
       ending,
       rate,
       bus,
+      // here bus means bus
     });
 
     await newFare.save();
