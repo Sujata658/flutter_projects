@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      darkTheme: ThemeData.dark(), 
+      darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       // home: MapPage(),
@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
         '/admin': (context) => AdminDashboard(),
 
         //support pages
-
       },
     );
   }

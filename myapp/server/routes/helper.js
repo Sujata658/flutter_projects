@@ -61,7 +61,7 @@ const routeToId = async (routename) => {
 const busIdToBus = async (busId) => {
   try {
     console.log("busid", busId);
-    const foundbus = await Bus.findOne({ bid: busId });
+    const foundbus = await Bus.findOne({ busId: busId });
 
     if (foundbus) {
       console.log("found bus's  from id ", foundbus);
@@ -136,9 +136,9 @@ const stopIdToStopName = async (stopId) => {
 };
 const stopIdToLatLong = async (stopId) => {
   try {
-    console.log(stopId);
+    // console.log(stopId);
     const foundstop = await Stop.findOne({ id: stopId }).select({ _id: 0 });
-    console.log(foundstop);
+    // console.log(foundstop);
     if (foundstop) {
       const coordinates = { lat: foundstop.lat, long: foundstop.long };
       return coordinates;

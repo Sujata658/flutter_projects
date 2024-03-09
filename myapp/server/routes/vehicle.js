@@ -7,6 +7,7 @@ router.post("/addVehicle", async (req, res) => {
     const { vid, name, type } = req.body;
 
     if (!vid || !name || !type) {
+      // console.log(req.body);
       return res.status(400).json({ error: "Missing required parameters" });
     }
 

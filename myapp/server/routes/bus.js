@@ -4,17 +4,18 @@ const router = express.Router();
 
 router.post("/addBus", async (req, res) => {
   try {
-    const { number, vehicleId, direction, route } = req.body;
+    const { vehicleId, busId, isDirection, route, bus_list } = req.body;
 
-    if (!number || !vehicleId || !direction || !route) {
+    if (!vehicleId || !isDirection || !route || !busId) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     const newBus = new Bus({
-      number,
       vehicleId,
-      direction,
+      busId,
+      isDirection,
       route,
+      bus_list,
     });
 
     await newBus.save();
@@ -35,33 +36,34 @@ router.get("/buses", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch buses" });
   }
 });
-router.get("/buslist", async (req, res) => {
-  try {
-    const buses = await Bus.find();
-    const BusNames = buses.map((Bus) => Bus.name);
-    res.json({ BusNames });
-  } catch (error) {
-    console.error("Error fetching buses:", error);
-    res.status(500).json({ error: "Failed to fetch buses" });
-  }
-});
+// router.get("/buslist", async (req, res) => {
+//   try {
+//     const buses = await Bus.find();
+//     const BusNames = buses.map((Bus) => Bus.name);
+//     res.json({ BusNames });
+//   } catch (error) {
+//     console.error("Error fetching buses:", error);
+//     res.status(500).json({ error: "Failed to fetch buses" });
+//   }
+// });
 
 router.put("/bus/:id", async (req, res) => {
   try {
-    const { number, vehicleId, direction, route } = req.body;
-    const busId = req.params.id;
+    const { vehicleId, busId, isDirection, route, bus_list } = req.body;
+    const bud_id = req.params.id;
 
-    if (!number || !vehicleId || !direction || !route) {
+    if (!vehicleId || !isDirection || !route || !busId || !bus_list) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     const updatedBus = await Bus.findByIdAndUpdate(
-      busId,
+      bud_id,
       {
-        number,
         vehicleId,
-        direction,
+        busId,
+        isDirection,
         route,
+        bus_list,
       },
       { new: true }
     );
@@ -80,9 +82,9 @@ router.put("/bus/:id", async (req, res) => {
 // Delete bus by ID
 router.delete("/bus/:id", async (req, res) => {
   try {
-    const busId = req.params.id;
+    const bud_id = req.params.id;
 
-    const deletedBus = await Bus.findByIdAndDelete(busId);
+    const deletedBus = await Bus.findByIdAndDelete(bud_id);
 
     if (!deletedBus) {
       return res.status(404).json({ error: "Bus not found" });

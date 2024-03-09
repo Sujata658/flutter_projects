@@ -6,10 +6,8 @@ const cookieParser = require("cookieparser");
 const Route = require("../models/routeModels");
 const router = express.Router();
 const Notification = require("../models/notificationSchema");
+const Vehicle = require("../models/vehicleSchema");
 const Fare = require("../models/fareModels");
-const Bus = require("../models/busSchema");
-
-const Stop = require("../models/stopModels");
 
 const { stopToId, busIdToBus, routeIdToroute } = require("../routes/helper");
 
@@ -75,7 +73,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/search", async (req, res) => {
+router.post("/searchAuth", async (req, res) => {
   try {
     let dir = 0;
     let { source, destination } = req.body;
@@ -93,9 +91,10 @@ router.post("/search", async (req, res) => {
       ending: destination,
     });
 
-    console.log(data);
+    // console.log(data);
 
     if (data.length === 0) {
+      console.log("data1 not found");
       const data2 = await Fare.find({
         starting: destination,
         ending: source,
@@ -105,7 +104,7 @@ router.post("/search", async (req, res) => {
         console.log("No matching routes found");
         return res.status(422).json({ error: "No matching routes found" });
       } else {
-        console.log("printing actual data", data2);
+        console.log("inside else loop");
         const responseData = data2.map(async (fare) => {
           const busId = fare.bus;
           const foundBus = await busIdToBus(busId);
@@ -132,33 +131,36 @@ router.post("/search", async (req, res) => {
           data: resolvedData,
         });
       }
+    } else {
+      console.log("inside data 1 else");
+      console.log(data);
+      const responseData = data.map(async (fare) => {
+        const busId = fare.bus;
+        const foundBus = await busIdToBus(busId);
+        console.log("foundBus", foundBus);
+        const routeId = foundBus.route;
+        const foundRoute = await routeIdToroute(routeId);
+
+        return {
+          rate: fare.rate,
+          bus: foundBus,
+          route: foundRoute.name,
+          routeId: routeId,
+          busId: busId,
+        };
+      });
+
+      // Wait for all promises in the responseData array to resolve
+      const resolvedData = await Promise.all(responseData);
+      console.log("no of found routes ", resolvedData.length);
+      console.log("found routes", resolvedData);
+
+      // Process the found routes as needed
+      return res.status(200).json({
+        message: "Matching routes found",
+        data: resolvedData,
+      });
     }
-
-    const responseData = data.map(async (fare) => {
-      const busId = fare.bus;
-      const foundBus = await busIdToBus(busId);
-      const routeId = foundBus.route;
-      const foundRoute = await routeIdToroute(routeId);
-
-      return {
-        rate: fare.rate,
-        bus: foundBus.name,
-        route: foundRoute.name,
-        routeId: routeId,
-        busId: busId,
-      };
-    });
-
-    // Wait for all promises in the responseData array to resolve
-    const resolvedData = await Promise.all(responseData);
-    console.log("no of found routes ", resolvedData.length);
-    console.log("found routes", resolvedData);
-
-    // Process the found routes as needed
-    return res.status(200).json({
-      message: "Matching routes found",
-      data: resolvedData,
-    });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Internal Server Error" });
