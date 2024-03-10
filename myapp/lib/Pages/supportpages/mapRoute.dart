@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -10,6 +11,13 @@ import 'package:myapp/Pages/supportpages/routedetail.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+
+class RouteData {
+  final List<String> coordinates;
+  final List<String> stopsNames;
+
+  RouteData(this.coordinates, this.stopsNames);
+}
 
 class MapRoute extends StatefulWidget {
   final List<Map<String, dynamic>> routedetails;
@@ -25,12 +33,14 @@ class MapRoute extends StatefulWidget {
 
 class _MapRouteState extends State<MapRoute> {
   var initialchoice = 0;
-  List<LatLng> decodedRoutePoints = [];
+  List<List<LatLng>> dark_decodedPolylines = [];
+  List<List<LatLng>> grey_decodedPolylines = [];
+  List<LatLng> change_points = [];
   List<LatLng> stops = [];
   List<dynamic> stopNames = [];
   bool isfetched = false;
-  
-  var currentRouteData ;
+
+  var currentRouteData = {};
 
   @override
   void initState() {
@@ -126,7 +136,7 @@ class _MapRouteState extends State<MapRoute> {
                                 Expanded(
                                   child: ListTile(
                                     title: Text(
-                                      '${widget.routedetails[index]['route']}',
+                                      '${currentRouteData['routeId']}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -137,12 +147,12 @@ class _MapRouteState extends State<MapRoute> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Rate: Rs. ${widget.routedetails[index]['rate']}',
+                                          'Rate: Rs. ${currentRouteData['rate']}',
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
                                         Text(
-                                          'Bus: ${widget.routedetails[index]['bus']}',
+                                          'Bus: ${currentRouteData['bus']}',
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
@@ -153,7 +163,12 @@ class _MapRouteState extends State<MapRoute> {
                                 if (index == initialchoice && isfetched)
                                   ElevatedButton(
                                     onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => RouteDetail(routeData: currentRouteData)));
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) => RouteDetail(
+                                      //             routeData:
+                                      //                 currentRouteData)));
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
@@ -199,11 +214,17 @@ class _MapRouteState extends State<MapRoute> {
             ),
             PolylineLayer(
               polylines: [
-                if (decodedRoutePoints.isNotEmpty)
+                for (var i = 0; i < grey_decodedPolylines.length; i++)
                   Polyline(
-                    points: decodedRoutePoints,
+                    points: grey_decodedPolylines[i],
                     strokeWidth: 5.0,
-                    color: Colors.blue,
+                    color: Colors.grey,
+                  ),
+                for (var i = 0; i < dark_decodedPolylines.length; i++)
+                  Polyline(
+                    points: dark_decodedPolylines[i],
+                    strokeWidth: 5.0,
+                    color: getRandomColor(),
                   ),
               ],
             ),
@@ -215,7 +236,8 @@ class _MapRouteState extends State<MapRoute> {
                       height: 80.0,
                       point: point,
                       child: JustTheTooltip(
-                          content: Text(stopNames[stops.indexOf(point)]),
+                          content: Text(currentRouteData['stopsNames']
+                              [stops.indexOf(point)]),
                           child: Icon(
                             Icons.directions_bus,
                             color: ktextcolor,
@@ -237,54 +259,79 @@ class _MapRouteState extends State<MapRoute> {
         isfetched = false;
       });
 
-      final res = await http.get(Uri.parse(
-          "http://localhost:5000/routes/${widget.routedetails[initialchoice]['routeId']}"));
+      late List<String> routeIds = [];
+      late List<List<String>> dark_coordinates = [];
+      late List<List<String>> grey_coordinates = [];
 
-      if (res.statusCode == 200) {
-        final singleroute = jsonDecode(res.body);
+      if (widget.routedetails[initialchoice]['flag'] == 'direct') {
+        routeIds.add(widget.routedetails[initialchoice]['routeId']);
 
-        currentRouteData = singleroute;
+        dark_coordinates.add(await getStopsCoordinates(
+            widget.routedetails[initialchoice]['lat_long']));
 
+        final res = await getSingleCoordinates(
+            widget.routedetails[initialchoice]['routeId']);
+        grey_coordinates.add(res.coordinates);
 
-      List<Map<String, dynamic>> coordinates =
-          (singleroute['latlongData'] as List)
-              .map((coord) => {
-                    'lat': coord['lat'].toDouble(),
-                    'long': coord['long'].toDouble(),
-                  })
-              .toList();
+        currentRouteData['routeId'] = routeIds[0];
+        currentRouteData['rate'] = widget.routedetails[initialchoice]['rate'];
+        currentRouteData['bus'] = widget.routedetails[initialchoice]['flag'];
+        currentRouteData['stops'] = res.coordinates;
+        currentRouteData['stopsNames'] = res.stopsNames;
 
-      List<String> points = coordinates
-          .map((coord) => '${coord['lat']},${coord['long']}')
-          .toList();
-
-      stops = coordinates
-          .map((coord) => LatLng(coord['lat'], coord['long']))
-          .toList();
-
-      stopNames = (singleroute['stopsData']);
-
-      String baatoAccessToken =
-          "bpk.Y3F6J1D0KoXZRXyiAh8qCGGD43TSSX7AzuDU9lhpK00g";
-
-      BaatoRoute baatoRoute = BaatoRoute.initialize(
-        accessToken: baatoAccessToken,
-        points: points,
-        mode: "car",
-        alternatives: false,
-        instructions: false,
-      );
-
-      final response = await baatoRoute.getRoutes();
-      String encodedPolyline = response.data?[0].encodedPolyline ?? "";
-
-       setState(() {
-          decodedRoutePoints = decodePolyline(encodedPolyline);
-          isfetched = true;
-        });
+        stops = grey_coordinates[0]
+            .map((coord) => LatLng(double.parse(coord.split(',')[0]),
+                double.parse(coord.split(',')[1])))
+            .toList();
+        stopNames = res.stopsNames;
       } else {
-        throw Exception('Failed to fetch route data. Status code: ${res.statusCode}');
+        print(widget.routedetails[initialchoice]["unique_routes"]);
+
+        routeIds = widget.routedetails[initialchoice]["unique_routes"]
+            .cast<String>()
+            .toList();
+
+        // print(widget.routedetails[initialchoice]["lat_long"].runtimeType);
+        // print(widget.routedetails[initialchoice]["routes"]
+        //         .cast<String>()
+        //         .toList());
+
+        dark_coordinates = await processChangePoints(
+            widget.routedetails[initialchoice]["stops_list"]
+                .cast<String>()
+                .toList(),
+            widget.routedetails[initialchoice]["change_point"],
+            widget.routedetails[initialchoice]["unique_routes"]
+                .cast<String>()
+                .toList(),
+            widget.routedetails[initialchoice]["routes"]
+                .cast<String>()
+                .toList(),
+            widget.routedetails[initialchoice]["lat_long"].toList());
+
+        // print(dark_coordinates);
+
+        for (var routeId in routeIds) {
+          final res = await getSingleCoordinates(routeId);
+
+          List<String> temp = res.coordinates;
+
+          grey_coordinates.add(temp);
+        }
+        currentRouteData['routeId'] = routeIds[0] + "-->" + routeIds[1];
+        currentRouteData['rate'] = widget.routedetails[initialchoice]['rate'];
+        currentRouteData['bus'] = widget.routedetails[initialchoice]['flag'];
       }
+
+      List<String> dark_encodedPolyline = await baatoPolyline(dark_coordinates);
+
+      List<String> grey_encodedPolyline = await baatoPolyline(grey_coordinates);
+
+      setState(() {
+        dark_decodedPolylines = decodePolyline(dark_encodedPolyline);
+        grey_decodedPolylines = decodePolyline(grey_encodedPolyline);
+        isfetched = true;
+      });
     } catch (e) {
       print('Error in MapRoute page: $e');
       setState(() {
@@ -293,34 +340,168 @@ class _MapRouteState extends State<MapRoute> {
     }
   }
 
+  List<List<LatLng>> decodePolyline(List<String> encoded) {
+    List<List<LatLng>> pointsss = [];
+    for (var i = 0; i < encoded.length; i++) {
+      List<LatLng> points = <LatLng>[];
+      int index = 0, len = encoded[i].length;
+      int lat = 0, lng = 0;
 
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> points = <LatLng>[];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
+      while (index < len) {
+        int b, shift = 0, result = 0;
+        do {
+          b = encoded[i].codeUnitAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
 
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
+        shift = 0;
+        result = 0;
+        do {
+          b = encoded[i].codeUnitAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
 
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      points.add(LatLng(lat / 1E5, lng / 1E5));
+        points.add(LatLng(lat / 1E5, lng / 1E5));
+      }
+      pointsss.add(points);
     }
-    return points;
+
+    return pointsss;
+  }
+
+  Future<RouteData> getSingleCoordinates(String routeId) async {
+    List<LatLng> fullRouteCoordinates = [];
+    List<String> finalCoord = [];
+    List<String> stopsNames = [];
+
+    final res =
+        await http.get(Uri.parse('http://localhost:5000/routes/$routeId'));
+
+    if (res.statusCode == 200) {
+      final routeData = jsonDecode(res.body);
+
+      fullRouteCoordinates = (routeData['latlongData'] as List)
+          .map((coord) => LatLng(coord['lat'], coord['long']))
+          .toList();
+
+      stopsNames = (routeData['stopsData'] as List).cast<String>();
+    }
+
+    finalCoord = fullRouteCoordinates
+        .map((coord) => '${coord.latitude},${coord.longitude}')
+        .toList();
+
+    return RouteData(finalCoord, stopsNames);
+  }
+
+  Future<List<String>> getStopsCoordinates(List<dynamic> latlng) async {
+    List<String> finalcoord = [];
+
+    final res =
+        (latlng).map((coord) => LatLng(coord['lat'], coord['long'])).toList();
+
+    finalcoord =
+        res.map((coord) => '${coord.latitude},${coord.longitude}').toList();
+
+    return finalcoord;
+  }
+
+  Future<List<String>> baatoPolyline(List<List<String>> coordinates) async {
+    List<String> encodedPolylines = [];
+
+    for (var coord in coordinates) {
+      String baatoAccessToken =
+          "bpk.Y3F6J1D0KoXZRXyiAh8qCGGD43TSSX7AzuDU9lhpK00g";
+
+      BaatoRoute baatoRoute = BaatoRoute.initialize(
+        accessToken: baatoAccessToken,
+        points: coord,
+        mode: "car",
+        alternatives: false,
+        instructions: false,
+      );
+
+      final response = await baatoRoute.getRoutes();
+      String encodedPolyline = response.data?[0].encodedPolyline ?? "";
+
+      encodedPolylines.add(encodedPolyline);
+    }
+
+    return encodedPolylines;
+  }
+
+  Future<List<List<String>>> processChangePoints(
+    List<String> stopsList,
+    String changePoint,
+    List<String> unique_routes,
+    List<String> routes,
+    List<dynamic> latlong,
+  ) async {
+    List<dynamic> tempList = [];
+    List<List<String>> stopsListss = [];
+
+    // var changePointIndex = stopsList.indexOf(changePoint);
+    // stopsList.remove(changePoint);
+
+    for (int i = 0; i < routes.length;) {
+      if (routes[i] == unique_routes[0]) {
+        tempList.add(latlong[i]);
+
+        i++;
+      }
+    }
+    stopsListss.add(await getStopsCoordinates(tempList));
+
+    return stopsListss;
+  }
+
+  Color getRandomColor() {
+    Random random = Random();
+    int colorIndex = random.nextInt(4);
+
+    switch (colorIndex) {
+      case 0:
+        return Colors.red;
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.yellow;
+      default:
+        return Colors.red;
+    }
   }
 }
+
+
+// final res = await http.get(Uri.parse(
+      //     "http://localhost:5000/routes/${widget.routedetails[initialchoice]['routeId']}"));
+      // if (res.statusCode == 200) {
+      //   final singleroute = jsonDecode(res.body);
+
+      //   currentRouteData = singleroute;
+
+      //   coordinates =
+      //       (singleroute['lat_long'] as List)
+      //           .map((coord) => {
+      //                 'lat': coord['lat'].toDouble(),
+      //                 'long': coord['long'].toDouble(),
+      //               })
+      //           .toList();
+
+      //   List<String> points = coordinates
+      //       .map((coord) => '${coord['lat']},${coord['long']}')
+      //       .toList();
+
+      //   stops = coordinates
+      //       .map((coord) => LatLng(coord['lat'], coord['long']))
+      //       .toList();
+
+      //   stopNames = (singleroute['stopsData']);

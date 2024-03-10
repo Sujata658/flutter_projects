@@ -102,10 +102,12 @@ class _SearchPageState extends State<SearchPage> {
         headers: {"Content-Type": "application/json"},
       );
 
+
       if (searchRes.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(searchRes.body);
-
-        if (responseData['message'] == 'Matching routes found') {
+        
+        
+        
           List<Map<String, dynamic>> routesData =
               List<Map<String, dynamic>>.from(responseData['data']);
 
@@ -118,7 +120,7 @@ class _SearchPageState extends State<SearchPage> {
                 content: Text('No matching routes found'),
               ),
             );
-          }
+          
         }
       }
     } catch (e) {

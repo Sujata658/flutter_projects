@@ -1039,8 +1039,7 @@ def find_shortest_path(graph, start_stop, end_stop):
 
         return path, distance, routes, changePoint
     except nx.NetworkXNoPath:
-        raise ValueError(f"No path found between stops {
-                         start_stop} and {end_stop}")
+        raise ValueError(f"No path found between stops {start_stop} and {end_stop}")
 
 
 # Example: Find shortest path, distance, and routes between Lagankhel (stop 1) and Kumaripati (stop 2)
@@ -1064,13 +1063,19 @@ try:
             seen_elements.append(element)
 
     # print(unique_elements
+    
+    stops_names = []
+    
+    for stop in shortest_path:
+        stops_names.append(stops[int(stop) - 1]['name'])
 
     result = {
         "shortest_path": (shortest_path),
         "routes": (shortest_routes),
-        "two_routes": unique_elements,
+        "unique_routes": unique_elements,
         "shortest_distance": shortest_distance,
-        "change_point": changePoint
+        "change_point": changePoint,
+        "stops_names": stops_names
     }
     # Convert to JSON
     json_result = json.dumps(result, indent=2)

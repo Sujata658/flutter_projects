@@ -195,19 +195,24 @@ router.post("/search", async (req, res) => {
               // Reverse the array before returning
             })
           );
-          const temp = [
+
+          const temp = {
+            "message": "Matching routes found",
+            "data":
+            [
             {
               flag: "indirect",
 
               //   result,
-              shortest_path: parsedResult.shortest_path,
+              stops_list: parsedResult.shortest_path,
               routes: parsedResult.routes,
-              two_routes: parsedResult.two_routes,
+              unique_routes: parsedResult.unique_routes,
               change_point: parsedResult.change_point,
               shortest_distance: parsedResult.shortest_distance,
               lat_long: latlongData,
+              stops_name: parsedResult.stops_names
             },
-          ];
+          ]};
           // resultArray.push(temp);
           // console.log(parsedResult);
 
