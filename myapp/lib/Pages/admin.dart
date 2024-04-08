@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Pages/admin_components/Buses/Buses.dart';
+import 'package:myapp/Pages/admin_components/Notification/Notificaions.dart';
 import 'package:myapp/Pages/admin_components/Vehicle/Vehicles.dart';
 import 'package:myapp/Pages/admin_components/Fares/FareView.dart';
 import 'package:myapp/Pages/admin_components/Routes/Routes.dart';
 import 'package:myapp/Pages/admin_components/Stops/Stops.dart';
 import 'package:myapp/Pages/components/constants.dart';
+import 'package:myapp/Pages/homepages/notifications.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
@@ -25,9 +27,12 @@ class AdminDashboard extends StatelessWidget {
               const SizedBox(height: 20.0),
               buildCard('Stop', Icons.place, Icons.edit, context, const Stops(), Colors.green),
               const SizedBox(height: 20.0),
+              buildCard('Notifications', Icons.notification_add, Icons.edit, context, Notifications(), Colors.pink),
+              const SizedBox(height: 20.0),
               buildCard('Fare', Icons.attach_money, Icons.edit, context, const FareView(), Colors.purple),
               const SizedBox(height: 20.0),
               buildCard('Bus', Icons.bus_alert, Icons.edit, context, Buses(), Colors.red),
+              
             ],
           ),
         ),

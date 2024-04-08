@@ -163,12 +163,12 @@ class _MapRouteState extends State<MapRoute> {
                                 if (index == initialchoice && isfetched)
                                   ElevatedButton(
                                     onPressed: () {
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) => RouteDetail(
-                                      //             routeData:
-                                      //                 currentRouteData)));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => RouteDetail(
+                                                  routeData:
+                                                      currentRouteData)));
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
@@ -285,31 +285,22 @@ class _MapRouteState extends State<MapRoute> {
             .toList();
         stopNames = res.stopsNames;
       } else {
-        print(widget.routedetails[initialchoice]["unique_routes"]);
-
         routeIds = widget.routedetails[initialchoice]["unique_routes"]
             .cast<String>()
             .toList();
-
-        // print(widget.routedetails[initialchoice]["lat_long"].runtimeType);
-        // print(widget.routedetails[initialchoice]["routes"]
-        //         .cast<String>()
-        //         .toList());
 
         dark_coordinates = await processChangePoints(
             widget.routedetails[initialchoice]["stops_list"]
                 .cast<String>()
                 .toList(),
             widget.routedetails[initialchoice]["change_point"],
-            widget.routedetails[initialchoice]["unique_routes"]
-                .cast<String>()
-                .toList(),
+            routeIds,
             widget.routedetails[initialchoice]["routes"]
                 .cast<String>()
                 .toList(),
             widget.routedetails[initialchoice]["lat_long"].toList());
 
-        // print(dark_coordinates);
+        print(routeIds);
 
         for (var routeId in routeIds) {
           final res = await getSingleCoordinates(routeId);
@@ -318,9 +309,13 @@ class _MapRouteState extends State<MapRoute> {
 
           grey_coordinates.add(temp);
         }
-        currentRouteData['routeId'] = routeIds[0] + "-->" + routeIds[1];
+        currentRouteData['routeId'] = "${routeIds[0]}-->${routeIds[1]}";
         currentRouteData['rate'] = widget.routedetails[initialchoice]['rate'];
         currentRouteData['bus'] = widget.routedetails[initialchoice]['flag'];
+        currentRouteData['stops'] = dark_coordinates;
+        currentRouteData['stopsNames'] = widget.routedetails[initialchoice]
+            ["stops_name"];
+        currentRouteData['change_point'] = widget.routedetails[initialchoice]["change_point"];
       }
 
       List<String> dark_encodedPolyline = await baatoPolyline(dark_coordinates);
@@ -444,20 +439,31 @@ class _MapRouteState extends State<MapRoute> {
     List<dynamic> latlong,
   ) async {
     List<dynamic> tempList = [];
+    List<dynamic> secondtempList = [];
     List<List<String>> stopsListss = [];
 
-    // var changePointIndex = stopsList.indexOf(changePoint);
-    // stopsList.remove(changePoint);
+    // print(latlong[stopsList.indexOf(changePoint)]);
+
+    secondtempList.add(latlong[stopsList.indexOf(changePoint)]);
 
     for (int i = 0; i < routes.length;) {
       if (routes[i] == unique_routes[0]) {
         tempList.add(latlong[i]);
-
+        i++;
+      } else if (routes[i] == unique_routes[1]) {
+        secondtempList.add(latlong[i]);
         i++;
       }
     }
-    stopsListss.add(await getStopsCoordinates(tempList));
 
+
+    if (tempList.length > 0) {
+      stopsListss.add(await getStopsCoordinates(tempList));
+      stopsListss.add(await getStopsCoordinates(secondtempList));
+    } else
+      stopsListss.add([]);
+
+    print(stopsListss.length);
     return stopsListss;
   }
 
