@@ -25,6 +25,7 @@ router.use(bodyParser.json());
 // POST endpoint to find the shortest path
 router.post("/search", (req, res) => {
   // Extract startStop and endStop from the request body
+  console.log("copy ?/")
 
   
   try {

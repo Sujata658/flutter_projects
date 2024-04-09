@@ -22,7 +22,7 @@ const {
   stopIdToLatLong,
 } = require("../routes/helper"); // Adjust the path
 
-router.post("/searchbyroute", async (req, res) => {
+router.post("/search", async (req, res) => {
   try {
     let { source, destination } = req.body;
     if (!source || !destination) {
@@ -30,6 +30,8 @@ router.post("/searchbyroute", async (req, res) => {
     }
 
     // Call your function to convert stops to IDs
+    source = parseInt(source);
+    destination = parseInt(destination);
 
     console.log("source and destination id", source, destination);
 
@@ -60,13 +62,41 @@ router.post("/searchbyroute", async (req, res) => {
         error += data.toString();
       });
 
-      pythonProcess.on("close", (code) => {
+      pythonProcess.on("close", async (code) => {
         console.log(`Python script exited with code ${code}`);
 
         if (code === 0) {
           try {
             // The result is already in string format, no need to parse
-            res.status(200).json(result);
+            const parsedResult = JSON.parse(result);
+            console.log("indirect result", parsedResult);
+            let stops_list = parsedResult.shortest_path;
+            // console.log(stops_list);
+
+            const latlongData = await Promise.all(
+              stops_list.map(async (stop) => {
+                // console.log("lat long data", stopIdToLatLong(stop));
+                return await stopIdToLatLong(stop);
+                // Reverse the array before returning
+              })
+            );
+            const temp = [
+              {
+                flag: "indirect",
+
+                //   result,
+                shortest_path: parsedResult.shortest_path,
+                routes: parsedResult.routes,
+                two_routes: parsedResult.two_routes,
+                change_point: parsedResult.change_point,
+                shortest_distance: parsedResult.shortest_distance,
+                lat_long: latlongData,
+              },
+            ];
+            // resultArray.push(temp);
+            // console.log(parsedResult);
+
+            res.status(200).json(temp);
           } catch (parseError) {
             console.error(`Error parsing result: ${parseError}`);
             res
@@ -131,6 +161,7 @@ router.post("/searchbyroute", async (req, res) => {
           });
           //write code to get stops from the stop ids from foundRoute.stops_list
           return {
+            flag: "direct",
             rate: rate,
             route: route.name,
             routeId: route.id,
@@ -190,6 +221,7 @@ router.post("/searchbyroute", async (req, res) => {
           });
           //write code to get stops from the stop ids from foundRoute.stops_list
           return {
+            flag: "direct",
             rate: rate,
             route: route.name,
             routeId: route.id,
