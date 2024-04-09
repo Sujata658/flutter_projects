@@ -37,6 +37,7 @@ router.post("/searchTry", async (req, res) => {
     });
 
     if (data.length === 0) {
+      console.log("no sidha direct rotue");
       const data2 = await Fare.find({
         starting: destination,
         ending: source,
@@ -85,6 +86,7 @@ router.post("/searchTry", async (req, res) => {
 
         // return res.status(422).json({ error: "No matching routes found" });
       } else {
+        console.log("there is sidha direct");
         console.log("printing actual data", data2);
         const responseData = data2.map(async (fare) => {
           const busId = fare.bus;

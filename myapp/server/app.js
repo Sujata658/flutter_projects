@@ -15,7 +15,8 @@ app.use(require("./routes/route"));
 app.use(require("./routes/vehicle"));
 app.use(require("./routes/scriptRunner"));
 app.use(require("./routes/indivBus"));
-app.use(require("./routes/directandindirect"));
+// app.use(require("./routes/directandindirect"));
+app.use(require("./routes/searchfromroutes"));
 
 app.listen(port, () => {
   console.log(`server connected at port ${port}`);
