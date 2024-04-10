@@ -132,8 +132,8 @@ class _MapPageState extends State<MapPage> {
                     ListTile(
                       title: Text(routeData['routeNames']![index]),
                       onTap: () {
-                        print(
-                            'Selected RouteId: ${routeData['routeIds']?[index]}');
+                        // print(
+                            // 'Selected RouteId: ${routeData['routeIds']?[index]}');
                         setState(() {
                           selectedIndex = index;
                         });
