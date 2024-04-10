@@ -71,6 +71,22 @@ const routeIdToroute = async (routeId) => {
     console.log(err);
   }
 };
+const routeIdTorouteName = async (routeId) => {
+  try {
+    console.log("routeid", routeId);
+    const foundroute = await route.findOne({ id: routeId }).select({ _id: 0 });
+
+    if (foundroute) {
+      console.log("found route's  from id ", foundroute);
+      return foundroute.name;
+    } else {
+      console.error("no such route");
+      res.status(400).json({ Err: "No such route" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
 const stopIdToStop = async (stopId) => {
   try {
     console.log("routeid", stopId);
@@ -127,4 +143,5 @@ module.exports = {
   stopIdToStop,
   stopIdToStopName,
   stopIdToLatLong,
+  routeIdTorouteName,
 };

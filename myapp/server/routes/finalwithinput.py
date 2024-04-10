@@ -4,11 +4,25 @@ import matplotlib.pyplot as plt
 import json
 
 import sys
+import requests
+
+# Make a GET request to the API endpoint
+# response = requests.get('http://localhost:5000/routes')
+
+
+# Check if the request was successful (status code 200)
+# if response.status_code == 200:
+#     # Print the response content
+#     print(response.json())
+#     # routes = response.json()
+# else:
+#     # Print an error message if the request was not successful
+#     print(f'Error: {response.status_code}')
 
 
 # Get source and destination from command-line arguments
-source = sys.argv[1]
-destination = sys.argv[2]
+# source = sys.argv[1]
+# destination = sys.argv[2]
 
 check_list = []
 multiple_labels = {}
@@ -1032,7 +1046,6 @@ def find_shortest_path(graph, start_stop, end_stop):
         # Find routes for each edge in the path
         routes = [graph[path[i]][path[i + 1]]['label']
                   for i in range(len(path) - 1)]
-
         temp_route = routes[0]
 
         for i, route_set in enumerate(routes):
@@ -1040,6 +1053,7 @@ def find_shortest_path(graph, start_stop, end_stop):
                 change_point = i
                 break
         changePoint = str(path[change_point])
+        # changePoint = change_point
 
         return path, distance, routes, changePoint
     except nx.NetworkXNoPath:
@@ -1050,13 +1064,15 @@ def find_shortest_path(graph, start_stop, end_stop):
 # Example: Find shortest path, distance, and routes between Lagankhel (stop 1) and Kumaripati (stop 2)
 
 # Print the result
+source = 16
+destination = 21
 try:
     shortest_path, shortest_distance, shortest_routes, changePoint = find_shortest_path(
         graph, source, destination)
-    # print("Shortest Path:", shortest_path)
-    # print("Shortest Distance:", shortest_distance, "meters")
-    # print("Routes:", shortest_routes)
-    # print("change point:", changePoint)
+    print("Shortest Path:", shortest_path)
+    print("Shortest Distance:", shortest_distance, "meters")
+    print("Routes:", shortest_routes)
+    print("change point:", changePoint)
 
     unique_elements = []
     seen_elements = []

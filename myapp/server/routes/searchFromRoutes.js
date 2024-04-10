@@ -19,6 +19,7 @@ const {
   stopToId,
   busIdToBus,
   routeIdToroute,
+  routeIdTorouteName,
   stopIdToLatLong,
 } = require("../routes/helper"); // Adjust the path
 
@@ -80,14 +81,31 @@ router.post("/search", async (req, res) => {
                 // Reverse the array before returning
               })
             );
+            let two_route = parsedResult.two_routes;
+
+            const routes_list = await Promise.all(
+              two_route.map(async (route) => {
+                console.log(route);
+
+                const name = await routeIdTorouteName(route);
+                console.log(typeof name);
+                return name;
+              })
+            );
+
+            console.log("routes list ", routes_list);
+
             const temp = [
               {
                 flag: "indirect",
 
                 //   result,
+                rate: "0",
+                // routes: parsedResult.routes,
+                routeId: parsedResult.two_routes,
+                routes: routes_list,
                 shortest_path: parsedResult.shortest_path,
-                routes: parsedResult.routes,
-                two_routes: parsedResult.two_routes,
+
                 change_point: parsedResult.change_point,
                 shortest_distance: parsedResult.shortest_distance,
                 lat_long: latlongData,
@@ -96,7 +114,9 @@ router.post("/search", async (req, res) => {
             // resultArray.push(temp);
             // console.log(parsedResult);
 
-            res.status(200).json(temp);
+            res
+              .status(200)
+              .json({ message: "Matching routes for indirect", data: temp });
           } catch (parseError) {
             console.error(`Error parsing result: ${parseError}`);
             res
