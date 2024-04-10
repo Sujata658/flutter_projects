@@ -1,4 +1,6 @@
 const Vehicle = require("../models/vehicleSchema");
+const Route = require("../models/routeModels");
+const Bus = require("../models/busSchema");
 const express = require("express");
 const router = express.Router();
 
@@ -91,6 +93,45 @@ router.delete("/vehicle/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting vehicle:", error);
     res.status(500).json({ error: "Failed to delete vehicle" });
+  }
+});
+
+router.get("/BusesListByVehicleId/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const vid = req.params.id;
+    const busesList = await Bus.find({ vehicleId: id });
+    let routesList = [];
+    let routesName = [];
+    let routeIdList = [];
+
+    // Use Promise.all to wait for all Route.find() promises to resolve
+    await Promise.all(
+      busesList.map(async (bus) => {
+        const routeId = bus.route;
+        const route = await Route.findOne({ id: routeId }); // Use findOne instead of find
+        if (route) {
+          routesName.push(route.name);
+          routesList.push(route);
+          routeIdList.push(route.id);
+        }
+      })
+    );
+
+    // Send response after all routes are fetched
+    res.json({
+      message: "Data by routes",
+      vehicle: vid,
+      data: {
+        routeId: routeIdList,
+        routeNames: routesName,
+        buses: busesList,
+        routes: routesList,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
