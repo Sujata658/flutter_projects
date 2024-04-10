@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -6,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:baato_api/baato_api.dart';
 import 'package:http/http.dart' as http;
+import 'package:myapp/Pages/bustracking/driverbt.dart';
 import 'package:myapp/Pages/components/constants.dart';
 
 class MapPage extends StatefulWidget {
@@ -23,10 +25,25 @@ class _MapPageState extends State<MapPage> {
   int selectedIndex = 0;
   var currentRouteData;
 
+  late StreamSubscription<Map<String, double>> _locationSubscription;
+  LatLng driverLocation = LatLng(0, 0);
+
   @override
   void initState() {
     super.initState();
     getRoutes();
+
+    Driver driver = Driver();
+
+    _locationSubscription = driver.locationStream.listen((locationData) {
+      double latitude = locationData['latitude']!;
+      double longitude = locationData['longitude']!;
+      print('Driver Location - Latitude: $latitude, Longitude: $longitude');
+
+      setState(() {
+        driverLocation = LatLng(latitude, longitude);
+      });
+    });
   }
 
   Future<void> getRoutes() async {
@@ -161,15 +178,27 @@ class _MapPageState extends State<MapPage> {
                               point: fake.isEmpty
                                   ? LatLng(27.717245, 85.323959)
                                   : LatLng(
-                                      double.parse(fake['$i']?[0] ?? '27.717245'),
-                                      double.parse(fake['$i']?[1] ?? '85.323959'),
+                                      double.parse(
+                                          fake['$i']?[0] ?? '27.717245'),
+                                      double.parse(
+                                          fake['$i']?[1] ?? '85.323959'),
                                     ),
                               child: const Icon(
                                 Icons.location_on,
                                 color: Colors.red,
-                                size: 40.0,
+                                size: 10.0,
                               ),
                             ),
+                          Marker(
+                            width: 80.0,
+                            height: 80.0,
+                            point: driverLocation,
+                            child: Icon(
+                              Icons.directions_bus,
+                              color: Colors.blue,
+                              size: 40.0,
+                            ),
+                          ),
                         ],
                       ),
                     ],

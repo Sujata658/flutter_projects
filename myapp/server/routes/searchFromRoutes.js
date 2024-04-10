@@ -21,6 +21,7 @@ const {
   routeIdToroute,
   routeIdTorouteName,
   stopIdToLatLong,
+  stopIdToStopName,
 } = require("../routes/helper"); // Adjust the path
 
 router.post("/search", async (req, res) => {
@@ -92,6 +93,8 @@ router.post("/search", async (req, res) => {
                 return name;
               })
             );
+            changePoint = parsedResult.change_point;
+            const changeStop = await stopIdToStopName(changePoint);
 
             console.log("routes list ", routes_list);
 
@@ -103,10 +106,10 @@ router.post("/search", async (req, res) => {
                 rate: "0",
                 // routes: parsedResult.routes,
                 routeId: parsedResult.two_routes,
+                change_point: changeStop,
                 route: routes_list,
                 shortest_path: parsedResult.shortest_path,
 
-                change_point: parsedResult.change_point,
                 shortest_distance: parsedResult.shortest_distance,
                 lat_long: latlongData,
               },

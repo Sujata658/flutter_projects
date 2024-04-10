@@ -12,11 +12,12 @@ class PlacesCard extends StatelessWidget {
 
   Future<void> fetchData() async {
     try {
-      final response = await http.get(Uri.parse(product['api'] as String));
+      final response = await http.get(Uri.parse('http://localhost:5000/${product['api']}'));
 
+      print(response.body);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        onDataFetched?.call(data);
+        print(data);
       } else {
         throw Exception('Failed to load data');
       }
