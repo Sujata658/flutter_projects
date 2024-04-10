@@ -15,16 +15,20 @@ class _RouteDetailState extends State<RouteDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.routeData);
     return isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator())
         : Scaffold(
             appBar: AppBar(
-              title: Text(
-                widget.routeData['routeId'] ?? '',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: ktextcolor,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  widget.routeData['route'] ?? '',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: ktextcolor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -33,13 +37,15 @@ class _RouteDetailState extends State<RouteDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Rate: ${widget.routeData['rate']}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: kDefaultIconLightColor,
-                    ),
-                  ),
+                  widget.routeData['rate'] == '0'
+                      ? Container()
+                      : Text(
+                          'Route: ${widget.routeData['route']}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                   const SizedBox(height: 8.0),
                   Text(
                     'Bus Type: ${widget.routeData['bus']}',
@@ -57,7 +63,10 @@ class _RouteDetailState extends State<RouteDetail> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                  widget.routeData['change_point'] == [] ? Container() : Text('Change Point: ${widget.routeData['change_point']}'),
+                  widget.routeData['change_point'] == null
+                      ? Container()
+                      : Text(
+                          'Change Point: ${widget.routeData['change_point']}'),
                   const SizedBox(height: 8.0),
                   Expanded(
                     child: ListView.builder(

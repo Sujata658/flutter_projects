@@ -50,6 +50,8 @@ class _MapRouteState extends State<MapRoute> {
 
   @override
   Widget build(BuildContext context) {
+    print(stops);
+    print(stopNames);
     return Scaffold(
       body: SlidingUpPanel(
         backdropEnabled: true,
@@ -266,11 +268,13 @@ class _MapRouteState extends State<MapRoute> {
       if (widget.routedetails[initialchoice]['flag'] == 'direct') {
         routeIds.add(widget.routedetails[initialchoice]['routeId']);
 
+        // print('269');
         dark_coordinates.add(await getStopsCoordinates(
-            widget.routedetails[initialchoice]['lat_long']));
+            widget.routedetails[initialchoice]['latlong']));
 
         final res = await getSingleCoordinates(
             widget.routedetails[initialchoice]['routeId']);
+        // print('275');
         grey_coordinates.add(res.coordinates);
 
         currentRouteData['routeId'] = routeIds[0];
@@ -285,37 +289,78 @@ class _MapRouteState extends State<MapRoute> {
             .toList();
         stopNames = res.stopsNames;
       } else {
-        routeIds = widget.routedetails[initialchoice]["unique_routes"]
+        // print('289');
+        var rids;
+
+        routeIds =
+            widget.routedetails[initialchoice]["route"].cast<String>().toList();
+        rids = widget.routedetails[initialchoice]["routeId"]
             .cast<String>()
             .toList();
 
+        // print('295');
+
         dark_coordinates = await processChangePoints(
-            widget.routedetails[initialchoice]["stops_list"]
+            widget.routedetails[initialchoice]["shortest_path"]
                 .cast<String>()
                 .toList(),
             widget.routedetails[initialchoice]["change_point"],
-            routeIds,
-            widget.routedetails[initialchoice]["routes"]
-                .cast<String>()
-                .toList(),
+            rids,
             widget.routedetails[initialchoice]["lat_long"].toList());
+        // print('305');
 
-        print(routeIds);
+        // print(dark_coordinates);
 
-        for (var routeId in routeIds) {
+        // print('313');
+
+        for (var routeId in rids) {
+          // print('inside');
           final res = await getSingleCoordinates(routeId);
 
           List<String> temp = res.coordinates;
 
           grey_coordinates.add(temp);
+          // print('grey_coordinates: $grey_coordinates');
         }
+        // print('outside');
         currentRouteData['routeId'] = "${routeIds[0]}-->${routeIds[1]}";
+        // print("currentRouteData: $currentRouteData['routeId']");
         currentRouteData['rate'] = widget.routedetails[initialchoice]['rate'];
+        // print("currentRouteData: $currentRouteData['rate']");
         currentRouteData['bus'] = widget.routedetails[initialchoice]['flag'];
-        currentRouteData['stops'] = dark_coordinates;
-        currentRouteData['stopsNames'] = widget.routedetails[initialchoice]
-            ["stops_name"];
-        currentRouteData['change_point'] = widget.routedetails[initialchoice]["change_point"];
+        // print("currentRouteData: $currentRouteData['bus']");
+        // print("currentRouteData: $currentRouteData['stops']");
+
+        var temparr = [];
+        List<LatLng> temparr1 = [];
+        for (var i = 0; i < rids.length; i++) {
+          // print("rids[i]: ${rids[i]}");
+          final tempcurr1 = await getSingleCoordinates(rids[i])
+              .then((value) => value.coordinates);
+
+          final tempcurr = await getSingleCoordinates(rids[i])
+              .then((value) => value.stopsNames);
+          // print("tempcurr: $tempcurr");
+          temparr.add(tempcurr);
+          temparr1.addAll(tempcurr1
+              .map((coord) => LatLng(double.parse(coord.split(',')[0]),
+                  double.parse(coord.split(',')[1])))
+              .toList());
+
+        }
+
+        print("temparr: ${temparr[0]}");
+
+        // currentRouteData['stopsNames'] = temparr;
+        // currentRouteData['stops'] = temparr1;
+
+        // stops.addAll(temparr1);
+        // stops.add(temparr1[0][temparr1[0].length - 1]);
+        // stopNames.addAll(temparr);
+        // print("currentRouteData: $currentRouteData");
+        currentRouteData['change_point'] =
+            widget.routedetails[initialchoice]["change_point"];
+        // print("currentRouteData: $currentRouteData");
       }
 
       List<String> dark_encodedPolyline = await baatoPolyline(dark_coordinates);
@@ -435,36 +480,29 @@ class _MapRouteState extends State<MapRoute> {
     List<String> stopsList,
     String changePoint,
     List<String> unique_routes,
-    List<String> routes,
     List<dynamic> latlong,
   ) async {
-    List<dynamic> tempList = [];
-    List<dynamic> secondtempList = [];
-    List<List<String>> stopsListss = [];
+    List<List<String>> finalCoordinates = [];
 
-    // print(latlong[stopsList.indexOf(changePoint)]);
+    List<String> temp = [];
+    List<String> temp2 = [];
 
-    secondtempList.add(latlong[stopsList.indexOf(changePoint)]);
-
-    for (int i = 0; i < routes.length;) {
-      if (routes[i] == unique_routes[0]) {
-        tempList.add(latlong[i]);
-        i++;
-      } else if (routes[i] == unique_routes[1]) {
-        secondtempList.add(latlong[i]);
-        i++;
+    for (var i = 0; i < stopsList.length; i++) {
+      if (stopsList[i] == changePoint) {
+        temp.add(stopsList[i]);
+        finalCoordinates.add(await getStopsCoordinates(latlong));
+        temp.clear();
+      } else {
+        temp.add(stopsList[i]);
       }
     }
 
+    temp2.add(changePoint);
+    finalCoordinates.add(await getStopsCoordinates(latlong));
 
-    if (tempList.length > 0) {
-      stopsListss.add(await getStopsCoordinates(tempList));
-      stopsListss.add(await getStopsCoordinates(secondtempList));
-    } else
-      stopsListss.add([]);
+    // print(finalCoordinates);
 
-    print(stopsListss.length);
-    return stopsListss;
+    return finalCoordinates;
   }
 
   Color getRandomColor() {

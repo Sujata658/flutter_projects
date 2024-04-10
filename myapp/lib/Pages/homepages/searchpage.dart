@@ -102,27 +102,44 @@ class _SearchPageState extends State<SearchPage> {
         headers: {"Content-Type": "application/json"},
       );
 
-
       if (searchRes.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(searchRes.body);
-        
-        
-        
-          List<Map<String, dynamic>> routesData =
-              List<Map<String, dynamic>>.from(responseData['data']);
 
-          if (routesData.isNotEmpty) {
-            nextpage(routesData);
-            return;
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('No matching routes found'),
-              ),
-            );
-          
+        List<Map<String, dynamic>> routesData =
+            List<Map<String, dynamic>>.from(responseData['data']);
+
+        if (routesData.isNotEmpty) {
+          nextpage(routesData);
+          return;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No matching routes found'),
+            ),
+          );
         }
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('No matching routes found'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
+
+      startLocationController.clear();
+      destinationLocationController.clear();
     } catch (e) {
       print('Error in search page: $e');
     } finally {

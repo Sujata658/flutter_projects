@@ -16,7 +16,40 @@ const colors = [
 ];
 
 const recommend = [
-  {'image': 'assets/images/vehicles/sajha.jpg', 'color': Color.fromARGB(255, 181, 255, 120), },
-  {'image': 'assets/images/vehicles/NY.jpg', 'color': Color.fromARGB(255, 255, 202, 104)},
-  {'image': 'assets/images/splash.png', 'color': Color(0xFF9BDDE1)},
+  {
+    'image': 'assets/images/vehicles/sajha.jpg',
+    'color': Color.fromARGB(255, 181, 255, 120),
+    'api': 'SaYa',
+    'name': "Sajha Yatayat"
+  },
+  {
+    'image': 'assets/images/vehicles/NY.jpg',
+    'color': Color.fromARGB(255, 255, 202, 104),
+    'api': 'NeYa',
+    'name': "Nepal Yatayat"
+  },
+  {
+    'image': 'assets/images/vehicles/safatempo.jpg',
+    'color': Color.fromARGB(255, 79, 226, 189),
+    'api': 'SaTmp',
+    'name': "Safa Tempo"
+  },
+  {
+    'image': 'assets/images/vehicles/mahanagar.jpg',
+    'color': Color.fromARGB(255, 32, 151, 231),
+    'api': 'MaYa',
+    'name': "Mahanagar Yatayat"
+  },
+  {
+    'image': 'assets/images/vehicles/juneli.jpeg',
+    'color': Color.fromARGB(255, 68, 238, 82),
+    'api': 'JuYa',
+    'name': "Juneli Yatayat"
+  },
+  {
+    'image': 'assets/images/vehicles/kantipur.jpg',
+    'color': Color.fromARGB(255, 241, 81, 81),
+    'api': 'KaYa',
+    'name': "Kantipur Yatayat"
+  },
 ];
