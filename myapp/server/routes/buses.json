@@ -1,0 +1,30 @@
+[
+  {
+    "vehicleId": "T2A",
+    "busId": "SaYa-T2A",
+    "isDirection": "0",
+    "route": "T2A",
+    "bus_list": []
+  },
+  {
+    "vehicleId": "T2B",
+    "busId": "SaYa-T2B",
+    "isDirection": "0",
+    "route": "T2B",
+    "bus_list": []
+  },
+  {
+    "vehicleId": "LA2RP",
+    "busId": "SaYa-LA2RP",
+    "isDirection": "0",
+    "route": "LA2RP",
+    "bus_list": []
+  },
+  {
+    "vehicleId": "LL2J",
+    "busId": "SaYa-LL2J",
+    "isDirection": "0",
+    "route": "LL2J",
+    "bus_list": []
+  }
+]
